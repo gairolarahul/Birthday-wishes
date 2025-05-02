@@ -554,7 +554,7 @@
                 <p>You've been selected for a top-secret birthday operation!</p>
                 
                 <label for="name">👤 Target Name:</label>
-                <input type="text" id="name" placeholder="Enter the birthday person's name" value="Arushi">
+                <input type="text" id="name" placeholder="Enter the birthday person's name">
                 
                 <label for="age">🎂 Achievement Level:</label>
                 <input type="number" id="age" placeholder="How many years awesome?">
@@ -587,8 +587,16 @@
 
     <!-- Audio elements -->
     <audio id="customBirthdaySong" preload="auto" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=happy-birthday-tropical-house-version-1-16104.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/download/audio/2023/08/22/audio_bc19dce97d.mp3?filename=happy-birthday-music-box-special-edition-with-effects-179721.mp3" type="audio/mpeg">
     </audio>
+    
+    <!-- YouTube Embed (hidden initially) -->
+    <div id="youtubePlayerContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center;">
+        <div style="position: relative; width: 80%; max-width: 640px;">
+            <button id="closeYoutubeBtn" style="position: absolute; top: -40px; right: 0; background: var(--accent-color); border: none; color: #000; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 2001;">✖</button>
+            <div id="youtubePlayer" style="width: 100%; aspect-ratio: 16/9;"></div>
+        </div>
+    </div>
 
     <script>
         // ===== SOUND SYSTEM =====
@@ -949,6 +957,11 @@
                     <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
                     <span>🔊</span>
                 </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button id="specialSongBtn" style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 12px 25px; font-size: 1.1rem; min-width: 200px; animation: pulse 2s infinite;" onclick="showYouTubePlayer()">
+                        🎵 Play Special Birthday Song 🎵
+                    </button>
+                </div>
             `;
             
             playerContainer.innerHTML = playerHTML;
@@ -957,6 +970,59 @@
             return playerContainer;
         };
         
+        // Load YouTube API
+        const loadYouTubeAPI = () => {
+            if (!window.YT) { // If YouTube API is not loaded yet
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            }
+        };
+        
+        // Initialize YouTube player
+        let youtubePlayer;
+        window.onYouTubeIframeAPIReady = () => {
+            youtubePlayer = new YT.Player('youtubePlayer', {
+                height: '360',
+                width: '640',
+                videoId: 'OOaj7xUqPUM',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 1,
+                    'rel': 0,
+                    'showinfo': 0,
+                    'modestbranding': 1
+                }
+            });
+        };
+        
+        // Show YouTube video player
+        const showYouTubePlayer = () => {
+            const container = document.getElementById('youtubePlayerContainer');
+            container.style.display = 'flex';
+            
+            if (youtubePlayer && youtubePlayer.playVideo) {
+                youtubePlayer.playVideo();
+            }
+            
+            // Pause the custom song when YouTube is playing
+            const customSong = document.getElementById('customBirthdaySong');
+            if (customSong) {
+                customSong.pause();
+            }
+        };
+        
+        // Close YouTube player
+        const closeYouTubePlayer = () => {
+            const container = document.getElementById('youtubePlayerContainer');
+            container.style.display = 'none';
+            
+            if (youtubePlayer && youtubePlayer.pauseVideo) {
+                youtubePlayer.pauseVideo();
+            }
+        };
+
         // Initialize custom music player functionality
         const initMusicPlayer = () => {
             // Get elements
@@ -970,6 +1036,9 @@
             const currentTime = document.getElementById('currentTime');
             const totalTime = document.getElementById('totalTime');
             const musicNotes = document.getElementById('musicNotes');
+            
+            // Load YouTube API
+            loadYouTubeAPI();
             
             // Set initial volume
             customSong.volume = volumeSlider.value / 100;
@@ -994,6 +1063,9 @@
             volumeSlider.addEventListener('input', () => {
                 customSong.volume = volumeSlider.value / 100;
             });
+            
+            // Setup YouTube close button
+            document.getElementById('closeYoutubeBtn').addEventListener('click', closeYouTubePlayer);
             
             // Update progress bar
             customSong.addEventListener('timeupdate', () => {
