@@ -216,28 +216,51 @@
             margin: 20px 0;
             opacity: 0;
             transition: opacity 1s;
-            height: 0;
+            height: auto;
+            max-height: 0;
             overflow: hidden;
+            transition: all 1s ease-in-out;
         }
         
         .command-output.active {
             opacity: 1;
             height: auto;
-            max-height: 300px;
+            max-height: 500px;
             overflow-y: auto;
         }
         
         .command-line {
-            margin: 8px 0;
-            padding-left: 20px;
+            margin: 12px 0;
+            padding-left: 30px;
             position: relative;
+            animation: fadeIn 0.5s forwards;
+            display: flex;
+            align-items: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .command-line::before {
             content: ">";
             position: absolute;
-            left: 5px;
+            left: 10px;
             color: var(--accent-color);
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .countdown-text {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 1.1rem;
         }
 
         /* Birthday message styling */
@@ -1079,7 +1102,7 @@
                     // Add countdown number
                     const numberDiv = document.createElement('div');
                     numberDiv.className = 'command-line';
-                    numberDiv.innerHTML = `<span style="font-size: 2rem;">${countdownNumbers[i]}</span> ${countdownText[i]}`;
+                    numberDiv.innerHTML = `<span class="countdown-number">${countdownNumbers[i]}</span><span class="countdown-text">${countdownText[i]}</span>`;
                     countdownSection.appendChild(numberDiv);
                     countdownSection.scrollTop = countdownSection.scrollHeight;
                     
