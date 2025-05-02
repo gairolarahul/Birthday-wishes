@@ -1,4 +1,101 @@
-<!DOCTYPE html>
+// Show the birthday message
+        const showBirthdayMessage = (name, age) => {
+            // Hide countdown, show birthday message
+            document.getElementById('countdownSection').style.display = 'none';
+            const birthdayMessage = document.getElementById('birthdayMessage');
+            birthdayMessage.style.display = 'block';
+            
+            // Create celebratory effects
+            createConfetti();
+            launchFireworks();
+            
+            // Play birthday song
+            stopAllSounds();
+            setTimeout(() => {
+                playSound('birthdaySong', 0.7);
+            }, 1000);
+            
+            // Build the message based on access level
+            let message = `
+                <div class="birthday-message">
+                    <div class="balloons">
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                    </div>
+                    
+                    <div class="surprise-reveal">SURPRISE!!!</div>
+                    
+                    <div class="cake">🎂</div>
+                    
+                    <h1>Happy Birthday, ${name}!</h1>
+            `;
+            
+            if (age) {
+                message += `<h2>Congratulations on turning ${age}! 🎉</h2>`;
+            }
+            
+            // Personalized message based on relationship
+            switch(accessLevel) {
+                case "friend":
+                    message += `
+                        <p>As your friend, I want you to know that you make every day more awesome!</p>
+                        <p>May your special day be filled with fun, laughter, and all your favorite things.</p>
+                        <p>You're the coolest friend anyone could wish for! Let's make this your best year yet!</p>
+                    `;
+                    break;
+                case "family":
+                    message += `
+                        <p>To my amazing family member who lights up our lives every single day.</p>
+                        <p>Our family wouldn't be the same without your smile, laughter, and love.</p>
+                        <p>We love you to the moon and back! Today is all about celebrating YOU!</p>
+                    `;
+                    break;
+                case "bestie":
+                    message += `
+                        <p>To my absolute BEST friend in the whole wide world!</p>
+                        <p>You're the most amazing, incredible, fantastic person I know.</p>
+                        <p>Thank you for being the kind of friend everyone dreams of having!</p>
+                        <p>Let's make today the most epic celebration ever!</p>
+                    `;
+                    break;
+                default:
+                    message += `
+                        <p>Wishing you the happiest of birthdays filled with joy and laughter!</p>
+                        <p>May all your wishes come true on this special day!</p>
+                    `;
+            }
+            
+            // Add personal message from Rahul Gairola
+            message += `
+                <div style="margin-top: 30px; padding: 20px; border: 2px dashed var(--accent-color); border-radius: 15px; background-color: rgba(0,0,0,0.3);">
+                    <h2 style="color: var(--primary-color); margin-bottom: 15px;">Special Birthday Wishes</h2>
+                    <p style="font-style: italic; font-size: 1.1rem;">On this special day, I wish you a year filled with happiness, success, and beautiful moments that become cherished memories. May your journey ahead be as bright and wonderful as you are!</p>
+                    <p style="text-align: right; margin-top: 10px; font-weight: bold; color: var(--secondary-color);">- Rahul Gairola</p>
+                </div>
+            `;
+            
+            // Add final celebration elements
+            message += `
+                <div style="margin-top: 30px;">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🎁 🎉 🎊 🎈 🎂 🎈 🎊 🎉 🎁</div>
+                    <p style="font-weight: bold; font-size: 1.2rem;">Your day should be as amazing as YOU are!</p>
+                </div>
+                
+                <div class="button-group" style="margin-top: 30px;">
+                    <button onclick="restartSurprise()">SEND AGAIN 🔄</button>
+                    <button onclick="toggleBirthdayMusic()">MUSIC 🎵</button>
+                </div>
+            `;
+            
+            birthdayMessage.innerHTML = message;
+            
+            // Start continuous celebration effects
+            startCelebrationEffects();
+        };
+                <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -476,7 +573,9 @@
             cheer: "https://assets.mixkit.co/active_storage/sfx/535/535-preview.mp3", // Crowd cheering
             trumpet: "https://assets.mixkit.co/active_storage/sfx/976/976-preview.mp3", // Trumpet fanfare
             birthday: "https://assets.mixkit.co/active_storage/sfx/531/531-preview.mp3", // Birthday music
+            birthdaySong: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_84e5bd1879.mp3?filename=happy-birthday-instrumental-hip-hop-128-bpm-9388.mp3", // Royalty-free happy birthday song
             click: "https://assets.mixkit.co/active_storage/sfx/2675/2675-preview.mp3" // Button click
+        };
         };
         
         // Create audio elements and store them
