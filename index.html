@@ -3,225 +3,445 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Wishes Generator</title>
+    <title>Secret Hacker Birthday Protocol</title>
+    <audio id="keyboardSound" preload="auto">
+        <source src="https://cdn.freesound.org/previews/328/328117_5296620-lq.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="accessGrantedSound" preload="auto">
+        <source src="https://cdn.freesound.org/previews/399/399934_5549376-lq.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="fireworkSound" preload="auto">
+        <source src="https://cdn.freesound.org/previews/4/4404_9058-lq.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="buttonClickSound" preload="auto">
+        <source src="https://cdn.freesound.org/previews/571/571008_10978243-lq.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="birthdaySong" preload="auto" loop>
+        <source src="https://cdn.freesound.org/previews/360/360596_1914751-lq.mp3" type="audio/mpeg">
+    </audio>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
+        
         .container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
         }
+
+        .terminal {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #0f0;
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal::before {
+            content: "SECURE TERMINAL v3.4.1";
+            display: block;
+            background-color: #0f0;
+            color: #000;
+            padding: 5px 10px;
+            margin: -20px -20px 20px -20px;
+            font-weight: bold;
+        }
+
         h1 {
-            color: #e91e63;
+            color: #0f0;
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 0 0 5px #0f0;
+            animation: glow 1.5s ease-in-out infinite alternate;
         }
-        input, select {
-            padding: 10px;
-            margin: 10px 0;
-            width: 80%;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #0f0;
+            }
+            to {
+                text-shadow: 0 0 20px #0f0;
+            }
         }
+
+        .typing {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 0.15em solid #0f0;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #0f0 }
+        }
+
         button {
-            background-color: #e91e63;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            background-color: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
             border-radius: 5px;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
             cursor: pointer;
-            margin-top: 15px;
-            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s;
         }
+
         button:hover {
-            background-color: #c2185b;
+            background-color: #0f0;
+            color: #000;
+            box-shadow: 0 0 10px #0f0;
         }
-        #wishOutput {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #fff8e1;
-            font-size: 18px;
-            display: none;
+
+        input {
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            width: 80%;
+            margin: 10px 0;
         }
-        .balloons {
-            display: none;
-            margin: 20px 0;
+
+        .command-output {
+            margin: 10px 0;
+            opacity: 0;
+            transition: opacity 1s;
         }
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #f0f;
+
+        .binary {
             position: absolute;
+            color: #0f0;
+            opacity: 0.1;
+            font-size: 10px;
+            z-index: 1;
             top: 0;
-            z-index: -1;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.5);
+            animation: explosion 1s ease-out forwards;
+            z-index: 1;
+        }
+
+        @keyframes explosion {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(20);
+                opacity: 0;
+            }
+        }
+
+        .cake {
+            font-size: 2em;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .glitch {
+            animation: glitch 1s linear infinite;
+        }
+
+        @keyframes glitch {
+            2%, 64% {
+                transform: translate(2px,0) skew(0deg);
+            }
+            4%, 60% {
+                transform: translate(-2px,0) skew(0deg);
+            }
+            62% {
+                transform: translate(0,0) skew(5deg); 
+            }
         }
     </style>
 </head>
 <body>
+    <div class="binary" id="binary"></div>
     <div class="container">
-        <h1>🎂 Birthday Wishes Generator 🎂</h1>
-        
-        <div>
-            <label for="name">Birthday Person's Name:</label>
-            <input type="text" id="name" placeholder="Enter name">
-        </div>
-        
-        <div>
-            <label for="age">Birthday Age (optional):</label>
-            <input type="number" id="age" placeholder="Enter age">
-        </div>
-        
-        <div>
-            <label for="relationship">Your Relationship:</label>
-            <select id="relationship">
-                <option value="friend">Friend</option>
-                <option value="family">Family Member</option>
-                <option value="partner">Partner</option>
-                <option value="colleague">Colleague</option>
-                <option value="other">Other</option>
-            </select>
-        </div>
-        
-        <div>
-            <label for="style">Message Style:</label>
-            <select id="style">
-                <option value="funny">Funny</option>
-                <option value="heartfelt">Heartfelt</option>
-                <option value="motivational">Motivational</option>
-                <option value="simple">Simple & Sweet</option>
-            </select>
-        </div>
-        
-        <button onclick="generateWish()">Generate Birthday Wish!</button>
-        
-        <div id="wishOutput"></div>
-        
-        <div class="balloons" id="balloons">
-            🎈🎈🎈🎈🎈🎈🎈
+        <div class="terminal">
+            <p id="initOutput" class="typing">Initializing Birthday Protocol...</p>
+            <div id="hackOutput" class="command-output"></div>
+            <div id="birthdayForm">
+                <p>Enter Target's Name:</p>
+                <input type="text" id="name" placeholder="Enter name">
+                <p>Enter Target's Age:</p>
+                <input type="number" id="age" placeholder="Enter age">
+                <p>Select Access Level:</p>
+                <button onclick="selectAccess('friend')">Friend</button>
+                <button onclick="selectAccess('family')">Family</button>
+                <button onclick="selectAccess('bestie')">Best Friend</button>
+                <p>Sound Control:</p>
+                <button id="soundToggle" onclick="toggleSound()">🔊 SOUND ON</button>
+                <p>Initiate Birthday Hack:</p>
+                <button onclick="executeHack()">EXECUTE</button>
+            </div>
         </div>
     </div>
 
     <script>
-        function generateWish() {
-            const name = document.getElementById('name').value.trim();
-            const age = document.getElementById('age').value.trim();
-            const relationship = document.getElementById('relationship').value;
-            const style = document.getElementById('style').value;
+        // Audio controls
+        let soundEnabled = true;
+        
+        // Function to play sound with control
+        const playSound = (soundId) => {
+            if (soundEnabled) {
+                const sound = document.getElementById(soundId);
+                if (sound) {
+                    // Reset the sound to the beginning if it's already playing
+                    sound.currentTime = 0;
+                    sound.play().catch(e => {
+                        console.log("Sound play error:", e);
+                        // Auto-play may be blocked by browser policy
+                    });
+                }
+            }
+        };
+        
+        // Stop all sounds
+        const stopAllSounds = () => {
+            const sounds = document.querySelectorAll('audio');
+            sounds.forEach(sound => {
+                sound.pause();
+                sound.currentTime = 0;
+            });
+        };
+        
+        // Toggle sound on/off
+        const toggleSound = () => {
+            soundEnabled = !soundEnabled;
+            if (!soundEnabled) {
+                stopAllSounds();
+                document.getElementById('soundToggle').textContent = "🔇 SOUND OFF";
+            } else {
+                document.getElementById('soundToggle').textContent = "🔊 SOUND ON";
+            }
+        };
+        
+        // Generate binary background
+        const generateBinary = () => {
+            let binary = "";
+            for (let i = 0; i < 5000; i++) {
+                binary += Math.floor(Math.random() * 2);
+                if (i % 50 === 0) binary += "<br>";
+            }
+            document.getElementById("binary").innerHTML = binary;
+        };
+        generateBinary();
+
+        // Access level variable
+        let accessLevel = "";
+        
+        // Select access level
+        const selectAccess = (level) => {
+            playSound("buttonClickSound");
+            accessLevel = level;
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase() === level.toLowerCase() || 
+                    btn.textContent.toLowerCase() === 'best friend' && level === 'bestie') {
+                    btn.style.backgroundColor = "#0f0";
+                    btn.style.color = "#000";
+                } else if (btn.textContent.toLowerCase() !== "execute" && 
+                          !btn.textContent.includes("SOUND")) {
+                    btn.style.backgroundColor = "#000";
+                    btn.style.color = "#0f0";
+                }
+            });
+        };
+
+        // Create a firework effect
+        const createFirework = () => {
+            if (Math.random() > 0.7) {
+                playSound("fireworkSound");
+            }
+            
+            const firework = document.createElement("div");
+            firework.className = "firework";
+            firework.style.left = Math.random() * 100 + "vw";
+            firework.style.top = Math.random() * 100 + "vh";
+            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            document.body.appendChild(firework);
+
+            // Remove firework after animation
+            setTimeout(() => {
+                firework.remove();
+            }, 1000);
+        };
+
+        // Launch multiple fireworks
+        const launchFireworks = () => {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(createFirework, i * 200);
+            }
+        };
+
+        // Execute the birthday hack
+        const executeHack = () => {
+            playSound("buttonClickSound");
+            
+            const name = document.getElementById("name").value;
+            const age = document.getElementById("age").value;
             
             if (!name) {
-                alert("Please enter the birthday person's name!");
+                alert("ERROR: Target name required for hack execution!");
                 return;
             }
             
-            let wishes = {
-                funny: [
-                    `Happy Birthday, ${name}! They say age is just a number, but in your case, it's a really big number! Just kidding! Have an amazing day!`,
-                    `${name}, remember that calories don't count on your birthday! Eat cake like nobody's watching!`,
-                    `Congrats on leveling up, ${name}! Your character has gained +1 wisdom and -1 metabolism!`
-                ],
-                heartfelt: [
-                    `Dear ${name}, on your special day, I want you to know how much joy and light you bring to my life. Happy Birthday!`,
-                    `${name}, may your birthday be as beautiful and wonderful as the friendship/love we share. Wishing you all the happiness in the world.`,
-                    `Happy Birthday to someone who makes the world a better place just by being in it. You're truly special, ${name}.`
-                ],
-                motivational: [
-                    `${name}, as you celebrate another year, remember that you have the power to achieve anything you set your mind to. Happy Birthday!`,
-                    `This new year of your life is full of possibilities, ${name}. Embrace them all! Happy Birthday!`,
-                    `${name}, may this birthday mark the beginning of an amazing journey filled with success and fulfillment!`
-                ],
-                simple: [
-                    `Happy Birthday, ${name}! Hope your day is as awesome as you are!`,
-                    `Wishing you a day filled with laughter and love, ${name}. Happy Birthday!`,
-                    `${name}, have the happiest of birthdays! You deserve it!`
-                ]
-            };
+            // Hide the form
+            document.getElementById("birthdayForm").style.display = "none";
             
-            // Add age-specific content if provided
-            if (age) {
-                wishes.funny.push(`${name}, ${age} years old? That's ${age * 12} months of being awesome!`);
-                wishes.heartfelt.push(`${name}, ${age} years of bringing joy and love into the world. What a beautiful milestone!`);
-                wishes.motivational.push(`${age} years of growth and learning. The best is yet to come, ${name}!`);
-                wishes.simple.push(`Happy ${age}th Birthday, ${name}! Have a wonderful day!`);
-            }
+            // Show hacking progress
+            const hackOutput = document.getElementById("hackOutput");
+            hackOutput.style.opacity = "1";
             
-            // Add relationship-specific content
-            const relationshipTerms = {
-                friend: "friend",
-                family: "family member",
-                partner: "partner",
-                colleague: "colleague",
-                other: "amazing person"
-            };
+            const commands = [
+                "$ initiating birthday protocol...",
+                "$ accessing secure mainframe...",
+                "$ bypassing security...",
+                "$ decrypting target data...",
+                "$ target identified: " + name,
+                "$ accessing celebration database...",
+                "$ compiling birthday algorithm...",
+                "$ preparing digital confetti...",
+                "$ activating birthday mode in 3...",
+                "$ 2...",
+                "$ 1...",
+                "$ HACK SUCCESSFUL!"
+            ];
             
-            wishes.heartfelt.push(`To the best ${relationshipTerms[relationship]} anyone could ask for - Happy Birthday, ${name}!`);
-            
-            // Select a random wish from the appropriate category
-            const selectedWishes = wishes[style];
-            const randomWish = selectedWishes[Math.floor(Math.random() * selectedWishes.length)];
-            
-            // Display the wish with some animation
-            const wishOutput = document.getElementById('wishOutput');
-            wishOutput.textContent = randomWish;
-            wishOutput.style.display = "block";
-            
-            // Show balloons
-            document.getElementById('balloons').style.display = "block";
-            
-            // Add confetti effect
-            createConfetti();
-        }
-        
-        function createConfetti() {
-            const confettiCount = 100;
-            const container = document.querySelector('body');
-            
-            for (let i = 0; i < confettiCount; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                
-                // Random position, color and size
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                confetti.style.width = (Math.random() * 10) + 5 + 'px';
-                confetti.style.height = (Math.random() * 10) + 5 + 'px';
-                
-                // Animation
-                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
-                container.appendChild(confetti);
-                
-                // Remove after animation
-                setTimeout(() => {
-                    confetti.remove();
-                }, 5000);
-            }
-            
-            // Add keyframes for the fall animation
-            if (!document.getElementById('confettiStyle')) {
-                const style = document.createElement('style');
-                style.id = 'confettiStyle';
-                style.innerHTML = `
-                    @keyframes fall {
-                        0% {
-                            transform: translateY(-10px) rotate(0deg);
-                            opacity: 1;
-                        }
-                        100% {
-                            transform: translateY(100vh) rotate(360deg);
-                            opacity: 0;
-                        }
+            // Animate typing commands
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < commands.length) {
+                    playSound("keyboardSound");
+                    hackOutput.innerHTML += commands[i] + "<br>";
+                    hackOutput.scrollTop = hackOutput.scrollHeight;
+                    i++;
+                    
+                    // Play access granted sound on last command
+                    if (i === commands.length) {
+                        setTimeout(() => {
+                            playSound("accessGrantedSound");
+                        }, 300);
                     }
-                `;
-                document.head.appendChild(style);
+                } else {
+                    clearInterval(interval);
+                    showBirthdayMessage(name, age);
+                }
+            }, 500);
+        };
+        
+        // Show the birthday message
+        const showBirthdayMessage = (name, age) => {
+            // Play the birthday song
+            stopAllSounds();
+            setTimeout(() => {
+                playSound("birthdaySong");
+            }, 500);
+            
+            // Clear terminal content
+            document.querySelector(".terminal").innerHTML = "";
+            
+            // Create new birthday message
+            const birthdayMessage = document.createElement("div");
+            birthdayMessage.style.textAlign = "center";
+            
+            // Add message based on access level
+            let message = `<h1 class="glitch">ACCESS GRANTED</h1>`;
+            message += `<div class="cake">🎂</div>`;
+            message += `<h1>Happy Birthday, ${name}!</h1>`;
+            
+            if (age) {
+                message += `<p>Congratulations on leveling up to age ${age}!</p>`;
             }
-        }
+            
+            switch(accessLevel) {
+                case "friend":
+                    message += `<p>You're officially one year closer to becoming a master hacker!</p>
+                                <p>May your code always compile and your bugs be easily fixed.</p>
+                                <p>Sending digital high-fives and virtual cake!</p>`;
+                    break;
+                case "family":
+                    message += `<p>The family encryption key gets stronger with you in it!</p>
+                                <p>You're the best firewall a family could have against boring days.</p>
+                                <p>Uploading tons of love and hugs to your life database!</p>`;
+                    break;
+                case "bestie":
+                    message += `<p>Best friends are like the perfect encryption algorithm - impossible to break!</p>
+                                <p>You're my favorite person to share the secret codes of life with.</p>
+                                <p>Your friendship has been downloaded to my heart forever!</p>`;
+                    break;
+                default:
+                    message += `<p>May your day be filled with as much fun as a computer with unlimited RAM!</p>
+                                <p>Wishing you a day of happiness overload!</p>`;
+            }
+            
+            message += `<p>PROTOCOL COMPLETE: Have an amazing birthday!</p>`;
+            message += `<button onclick="restartHack()">RESTART HACK</button>`;
+            message += `<button id="soundToggle" onclick="toggleSound()">🔊 SOUND ON</button>`;
+            
+            birthdayMessage.innerHTML = message;
+            document.querySelector(".terminal").appendChild(birthdayMessage);
+            
+            // Launch fireworks
+            launchFireworks();
+            
+            // Repeat fireworks
+            setInterval(launchFireworks, 5000);
+        };
+        
+        // Restart the hack
+        const restartHack = () => {
+            playSound("buttonClickSound");
+            stopAllSounds();
+            location.reload();
+        };
     </script>
 </body>
 </html>
