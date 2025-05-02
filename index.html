@@ -1059,7 +1059,9 @@
             const buttons = document.querySelectorAll('.button-group button:not(.primary)');
             
             buttons.forEach(btn => {
-                if (btn.textContent.toLowerCase().includes(level.toLowerCase())) {
+                if (level === 'bestie' && btn.textContent === 'Best Friend') {
+                    btn.classList.add('selected');
+                } else if (btn.textContent.toLowerCase() === level.toLowerCase()) {
                     btn.classList.add('selected');
                 } else {
                     btn.classList.remove('selected');
