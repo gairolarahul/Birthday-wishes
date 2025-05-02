@@ -3,322 +3,483 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret Birthday Mission</title>
+    <title>TOP SECRET MESSAGE</title>
     <style>
+        :root {
+            --primary-color: #FF3E9D;
+            --secondary-color: #0CF2FF;
+            --accent-color: #FFD639;
+            --dark-color: #2A1B3D;
+            --light-color: #FFFFFF;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
             margin: 0;
             padding: 0;
-            background-color: #2E0854;
-            color: #FFD700;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            overflow: hidden;
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            background-image: radial-gradient(#5A1999, #2E0854);
+            position: relative;
         }
         
-        .container {
-            width: 90%;
-            max-width: 800px;
+        /* Initial screen - locked appearance */
+        #lockScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            color: var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
             text-align: center;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .lock-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .unlock-btn {
+            margin-top: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .unlock-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        /* Main content container */
+        .container {
+            width: 95%;
+            max-width: 800px;
+            padding: 20px;
             position: relative;
-            z-index: 2;
+            z-index: 5;
+            display: none; /* Hidden initially */
         }
 
+        /* Mission terminal */
         .terminal {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            border: 3px solid #FF69B4;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 3px solid var(--primary-color);
             border-radius: 20px;
-            box-shadow: 0 0 15px #FF69B4, 0 0 25px #00FFFF;
+            padding: 20px;
             margin-bottom: 20px;
-            text-align: left;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 0 30px var(--primary-color),
+                        0 0 50px var(--secondary-color);
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         .terminal::before {
-            content: "🎮 BIRTHDAY MISSION CONTROL 🎮";
+            content: "✨ SECRET BIRTHDAY MISSION ✨";
             display: block;
-            background: linear-gradient(to right, #FF69B4, #00FFFF);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             color: #000;
-            padding: 8px 10px;
-            margin: -20px -20px 20px -20px;
             font-weight: bold;
-            border-radius: 17px 17px 0 0;
+            padding: 10px;
+            margin: -20px -20px 20px -20px;
             text-align: center;
+            border-radius: 17px 17px 0 0;
+            font-size: 1.2rem;
         }
 
+        h1, h2 {
+            text-align: center;
+            margin: 15px 0;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+        
         h1 {
-            color: #FF69B4;
-            font-size: 2.5em;
-            margin: 0;
-            text-shadow: 2px 2px 0 #00FFFF, -2px -2px 0 #00FFFF;
-            animation: colorChange 3s infinite;
+            font-size: 2rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+        }
+        
+        p {
+            margin: 15px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
         }
 
-        @keyframes colorChange {
-            0% { color: #FF69B4; }
-            33% { color: #FFD700; }
-            66% { color: #00FFFF; }
-            100% { color: #FF69B4; }
+        /* Form elements styling */
+        input {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: var(--light-color);
+            border: 2px solid var(--secondary-color);
+            border-radius: 15px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            width: 100%;
+            margin: 10px 0;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-
-        .typing {
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 0.15em solid #FFD700;
-            margin: 0 auto;
-            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-            font-size: 1.2em;
+        
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px var(--primary-color);
         }
-
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
-
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: #FFD700 }
+        
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
         }
 
         button {
-            background: linear-gradient(to bottom, #FF69B4, #FF1493);
+            background: linear-gradient(135deg, var(--primary-color), #FF71B8);
             color: white;
-            border: 2px solid #00FFFF;
-            border-radius: 15px;
-            padding: 12px 24px;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1rem;
             cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
-            text-shadow: 1px 1px 2px #000;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 5px;
+            min-width: 120px;
+        }
+        
+        button:hover, button:focus {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        button.selected {
+            background: linear-gradient(135deg, var(--secondary-color), #66E7F7);
+            color: #000;
+        }
+        
+        button.primary {
+            background: linear-gradient(135deg, #FFD639, #FFA726);
+            font-size: 1.2rem;
+            padding: 15px 30px;
         }
 
-        button:hover {
-            background: linear-gradient(to bottom, #00FFFF, #00CED1);
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(255, 105, 180, 0.8);
-        }
-
-        input {
-            background-color: rgba(0, 0, 0, 0.5);
-            color: #FFD700;
-            border: 2px solid #FF69B4;
-            border-radius: 10px;
-            padding: 12px;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            width: 80%;
-            margin: 10px 0;
-            font-size: 1.1em;
-        }
-
-        input::placeholder {
-            color: rgba(255, 215, 0, 0.6);
-        }
-
+        /* Output area */
         .command-output {
-            margin: 10px 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
             opacity: 0;
             transition: opacity 1s;
-            font-size: 1.1em;
+            height: 0;
+            overflow: hidden;
         }
-
-        .floating-objects {
+        
+        .command-output.active {
+            opacity: 1;
+            height: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .command-line {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .command-line::before {
+            content: ">";
             position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 1;
+            left: 5px;
+            color: var(--accent-color);
         }
 
-        .float-item {
-            position: absolute;
-            font-size: 30px;
-            animation: float 15s linear infinite;
-            opacity: 0.5;
+        /* Birthday message styling */
+        .birthday-message {
+            text-align: center;
+            animation: fadeInScale 1s forwards;
         }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-            }
+        
+        @keyframes fadeInScale {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
-
-        .firework {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.8);
-            animation: explosion 1.5s ease-out forwards;
-            z-index: 1;
-        }
-
-        @keyframes explosion {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(25);
-                opacity: 0;
-            }
-        }
-
+        
         .cake {
-            font-size: 4em;
+            font-size: 5rem;
             margin: 20px 0;
+            display: inline-block;
             animation: bounce 2s infinite;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
         }
-
+        
         @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0) scale(1);
-            }
-            50% {
-                transform: translateY(-15px) scale(1.1);
-            }
-        }
-
-        .glitch {
-            animation: glitch 1s linear infinite;
-            color: #FF69B4;
-            text-shadow: 2px 2px 0 #00FFFF, -2px -2px 0 #FFD700;
-        }
-
-        @keyframes glitch {
-            2%, 64% {
-                transform: translate(2px,0) skew(0deg);
-            }
-            4%, 60% {
-                transform: translate(-2px,0) skew(0deg);
-            }
-            62% {
-                transform: translate(0,0) skew(5deg); 
-            }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
         }
         
         .balloons {
             display: flex;
             justify-content: center;
-            margin: 20px 0;
+            flex-wrap: wrap;
+            margin: 15px 0;
         }
         
         .balloon {
-            font-size: 3em;
+            font-size: 3rem;
             margin: 0 10px;
-            animation: balloonFloat 3s ease-in-out infinite;
+            animation: float 3s ease-in-out infinite;
         }
         
-        .balloon:nth-child(2) {
-            animation-delay: 0.3s;
+        .balloon:nth-child(1) { animation-delay: 0s; }
+        .balloon:nth-child(2) { animation-delay: 0.3s; }
+        .balloon:nth-child(3) { animation-delay: 0.6s; }
+        .balloon:nth-child(4) { animation-delay: 0.9s; }
+        .balloon:nth-child(5) { animation-delay: 1.2s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
         }
         
-        .balloon:nth-child(3) {
-            animation-delay: 0.6s;
+        .surprise-reveal {
+            font-size: 2.5rem;
+            animation: colorRotate 4s linear infinite;
+            text-shadow: 0 0 10px currentColor;
+            font-weight: bold;
+            margin: 20px 0;
         }
         
-        .balloon:nth-child(4) {
-            animation-delay: 0.9s;
+        @keyframes colorRotate {
+            0% { color: var(--primary-color); }
+            33% { color: var(--secondary-color); }
+            66% { color: var(--accent-color); }
+            100% { color: var(--primary-color); }
         }
         
-        .balloon:nth-child(5) {
-            animation-delay: 1.2s;
+        /* Background effects */
+        .firework {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: explosion 1.5s ease-out forwards;
+            z-index: 1;
+            pointer-events: none;
         }
         
-        @keyframes balloonFloat {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
+        @keyframes explosion {
+            0% { transform: scale(0.1); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: scale(25); opacity: 0; }
         }
         
-        .gift {
-            font-size: 2.5em;
-            display: inline-block;
-            margin: 0 10px;
-            animation: giftspin 3s ease-in-out infinite;
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 15px;
+            top: -20px;
+            animation: fall 5s linear forwards;
+            z-index: 1;
+            pointer-events: none;
         }
         
-        @keyframes giftspin {
-            0% {
-                transform: rotate(-10deg);
-            }
-            50% {
-                transform: rotate(10deg);
-            }
-            100% {
-                transform: rotate(-10deg);
-            }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
         }
         
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        /* Surprise peeking elements during countdown */
+        .surprise-peek {
+            position: fixed;
+            font-size: 3rem;
+            opacity: 0;
+            animation: peek 1s ease-in-out forwards;
+            z-index: 3;
+            transform-origin: center;
+            pointer-events: none;
+        }
+        
+        @keyframes peek {
+            0% { transform: scale(0.5); opacity: 0; }
+            20% { transform: scale(1.2); opacity: 1; }
+            80% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        /* Sound controls */
         .sound-button {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            border: 2px solid var(--secondary-color);
             border-radius: 50%;
             width: 50px;
             height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5em;
+            font-size: 1.5rem;
             cursor: pointer;
             z-index: 100;
+            box-shadow: 0 0 10px var(--secondary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.3rem; }
+            .cake { font-size: 4rem; }
+            .balloon { font-size: 2.5rem; }
+            .surprise-reveal { font-size: 2rem; }
+            .lock-icon { font-size: 4rem; }
+            .terminal::before { font-size: 1rem; }
+            .sound-button { width: 40px; height: 40px; font-size: 1.2rem; }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.1rem; }
+            p { font-size: 1rem; }
+            .cake { font-size: 3.5rem; }
+            .balloon { font-size: 2rem; }
+            .surprise-reveal { font-size: 1.7rem; }
+            .lock-icon { font-size: 3.5rem; }
+            button { font-size: 0.9rem; padding: 10px 20px; min-width: 100px; }
+            .unlock-btn { font-size: 1rem; padding: 12px 25px; }
+            .terminal { padding: 15px; }
+            .terminal::before { font-size: 0.9rem; padding: 8px; }
         }
     </style>
 </head>
 <body>
-    <div class="floating-objects" id="floatingObjects"></div>
-    <div class="container">
+    <!-- Initial locked screen for surprise effect -->
+    <div id="lockScreen">
+        <div class="lock-icon">🔒</div>
+        <h1>TOP SECRET MESSAGE</h1>
+        <p>Classified information awaits...</p>
+        <button class="unlock-btn" onclick="unlockScreen()">UNLOCK</button>
+    </div>
+    
+    <!-- Background elements container -->
+    <div class="background-elements" id="backgroundElements"></div>
+    
+    <!-- Main content -->
+    <div class="container" id="mainContent">
         <div class="terminal">
-            <p id="initOutput" class="typing">👋 Starting Special Birthday Mission... 👋</p>
-            <div id="hackOutput" class="command-output"></div>
             <div id="birthdayForm">
-                <p>🌟 Enter Birthday Star's Name:</p>
-                <input type="text" id="name" placeholder="Type their name here">
-                <p>🎂 How many years awesome:</p>
-                <input type="number" id="age" placeholder="Enter their age">
-                <p>🤝 Your special connection:</p>
-                <button onclick="selectAccess('friend')">Friend</button>
-                <button onclick="selectAccess('family')">Family</button>
-                <button onclick="selectAccess('bestie')">Best Friend</button>
-                <p>🎮 Start the Birthday Adventure:</p>
-                <button onclick="executeHack()" style="font-size: 1.2em;">LAUNCH MISSION 🚀</button>
+                <h2>🔐 SECRET MISSION DETAILS 🔐</h2>
+                <p>You've been selected for a top-secret birthday operation!</p>
+                
+                <label for="name">👤 Target Name:</label>
+                <input type="text" id="name" placeholder="Enter the birthday person's name">
+                
+                <label for="age">🎂 Achievement Level:</label>
+                <input type="number" id="age" placeholder="How many years awesome?">
+                
+                <p>🤝 Your Clearance Level:</p>
+                <div class="button-group">
+                    <button onclick="selectAccess('friend')">Friend</button>
+                    <button onclick="selectAccess('family')">Family</button>
+                    <button onclick="selectAccess('bestie')">Best Friend</button>
+                </div>
+                
+                <p>Are you ready to launch the surprise?</p>
+                <div class="button-group">
+                    <button class="primary" onclick="startCountdown()">INITIATE SURPRISE 🚀</button>
+                </div>
+            </div>
+            
+            <div id="countdownSection" class="command-output">
+                <!-- Countdown will be displayed here -->
+            </div>
+            
+            <div id="birthdayMessage" style="display: none;">
+                <!-- Birthday message will be displayed here -->
             </div>
         </div>
     </div>
     
+    <!-- Sound control button -->
     <div class="sound-button" onclick="toggleSound()" id="soundToggle">🔊</div>
 
     <script>
+        // ===== SOUND SYSTEM =====
+        
         // Create audio elements programmatically
         const soundEffects = {
-            keyboard: "https://www.myinstants.com/media/sounds/keyboard-typing.mp3",
-            success: "https://www.myinstants.com/media/sounds/game-level-complete.mp3",
-            firework: "https://www.myinstants.com/media/sounds/firework-sound.mp3",
-            button: "https://www.myinstants.com/media/sounds/click.mp3",
-            birthday: "https://www.myinstants.com/media/sounds/happy-birthday-music-box.mp3"
+            unlock: "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3", // Door unlock sound
+            startup: "https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3", // Computer startup
+            keypress: "https://assets.mixkit.co/active_storage/sfx/2688/2688-preview.mp3", // Keyboard typing
+            alert: "https://assets.mixkit.co/active_storage/sfx/2867/2867-preview.mp3", // Alert beep
+            countdown: "https://assets.mixkit.co/active_storage/sfx/254/254-preview.mp3", // Countdown beep
+            success: "https://assets.mixkit.co/active_storage/sfx/1343/1343-preview.mp3", // Success sound
+            surprise: "https://assets.mixkit.co/active_storage/sfx/2005/2005-preview.mp3", // Surprise reveal
+            firework: "https://assets.mixkit.co/active_storage/sfx/1393/1393-preview.mp3", // Firework explosion
+            cheer: "https://assets.mixkit.co/active_storage/sfx/535/535-preview.mp3", // Crowd cheering
+            trumpet: "https://assets.mixkit.co/active_storage/sfx/976/976-preview.mp3", // Trumpet fanfare
+            birthday: "https://assets.mixkit.co/active_storage/sfx/531/531-preview.mp3", // Birthday music
+            click: "https://assets.mixkit.co/active_storage/sfx/2675/2675-preview.mp3" // Button click
         };
         
-        // Create audio elements
+        // Create audio elements and store them
         const sounds = {};
         for (const [key, url] of Object.entries(soundEffects)) {
             const audio = new Audio(url);
@@ -326,29 +487,68 @@
                 audio.loop = true;
             }
             sounds[key] = audio;
-            document.body.appendChild(audio);
         }
         
-        // Audio controls
+        // Sound control variables
         let soundEnabled = true;
+        let audioContext = null;
         
-        // Function to play sound with control
-        const playSound = (soundKey) => {
+        // Initialize AudioContext on first user interaction
+        const initAudio = () => {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Try to play a silent sound to unlock audio on iOS
+                    const silentSound = audioContext.createOscillator();
+                    silentSound.frequency.value = 0;
+                    silentSound.connect(audioContext.destination);
+                    silentSound.start(0);
+                    silentSound.stop(0.001);
+                } catch (e) {
+                    console.log("Audio context could not be created:", e);
+                }
+            }
+        };
+        
+        // Play sound with volume control and error handling
+        const playSound = (soundKey, volume = 1.0) => {
             if (soundEnabled && sounds[soundKey]) {
-                // Reset the sound to the beginning if it's already playing
-                sounds[soundKey].currentTime = 0;
-                sounds[soundKey].play().catch(e => {
-                    console.log("Sound play error:", e);
-                    // Auto-play may be blocked by browser policy
-                });
+                try {
+                    // Ensure audio is initialized
+                    initAudio();
+                    
+                    // Reset the sound to the beginning if it's already playing
+                    sounds[soundKey].currentTime = 0;
+                    sounds[soundKey].volume = volume;
+                    
+                    // Try to play the sound
+                    const playPromise = sounds[soundKey].play();
+                    
+                    // Handle the play promise
+                    if (playPromise !== undefined) {
+                        playPromise.catch(e => {
+                            console.log(`Sound play error (${soundKey}):`, e);
+                            // If autoplay is blocked, we'll try again after a user gesture
+                            document.body.addEventListener('click', () => {
+                                sounds[soundKey].play().catch(() => {});
+                            }, { once: true });
+                        });
+                    }
+                } catch (e) {
+                    console.log(`Error playing ${soundKey}:`, e);
+                }
             }
         };
         
         // Stop all sounds
         const stopAllSounds = () => {
             for (const sound of Object.values(sounds)) {
-                sound.pause();
-                sound.currentTime = 0;
+                try {
+                    sound.pause();
+                    sound.currentTime = 0;
+                } catch (e) {
+                    console.log("Error stopping sound:", e);
+                }
             }
         };
         
@@ -361,228 +561,336 @@
                 soundToggle.textContent = "🔇";
             } else {
                 soundToggle.textContent = "🔊";
+                playSound('click', 0.5);
             }
         };
         
-        // Create floating objects
-        const createFloatingObjects = () => {
-            const container = document.getElementById('floatingObjects');
-            const emojis = ['🎮', '🚀', '💻', '🔑', '🎯', '🎨', '🎪', '🎭', '🎡', '🧸', '🦄', '🌈'];
-            
-            for (let i = 0; i < 20; i++) {
-                const item = document.createElement('div');
-                item.className = 'float-item';
-                item.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                item.style.left = `${Math.random() * 100}vw`;
-                item.style.animationDuration = `${15 + Math.random() * 15}s`;
-                item.style.animationDelay = `${Math.random() * 10}s`;
-                container.appendChild(item);
-            }
-        };
-        createFloatingObjects();
-
-        // Access level variable
-        let accessLevel = "";
+        // ===== VISUAL EFFECTS =====
         
-        // Select access level
-        const selectAccess = (level) => {
-            playSound("button");
-            accessLevel = level;
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(btn => {
-                if (btn.textContent.toLowerCase().includes(level.toLowerCase()) || 
-                    btn.textContent.toLowerCase().includes('best friend') && level === 'bestie') {
-                    btn.style.background = 'linear-gradient(to bottom, #00FFFF, #00CED1)';
-                } else if (!btn.textContent.toLowerCase().includes('launch')) {
-                    btn.style.background = 'linear-gradient(to bottom, #FF69B4, #FF1493)';
-                }
-            });
-        };
-
-        // Create a firework effect
+        // Create a firework
         const createFirework = () => {
-            if (Math.random() > 0.8) {
-                playSound("firework");
+            const colors = [
+                '#FF3E9D', '#0CF2FF', '#FFD639', '#FF8C00', 
+                '#39FF14', '#9B30FF', '#FF1493', '#00FFFF'
+            ];
+            
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${Math.random() * 100}vw`;
+            firework.style.top = `${Math.random() * 100}vh`;
+            firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            firework.style.boxShadow = `0 0 10px 2px ${firework.style.backgroundColor}`;
+            
+            document.getElementById('backgroundElements').appendChild(firework);
+            
+            // Play firework sound randomly
+            if (Math.random() > 0.7) {
+                playSound('firework', 0.4);
             }
             
-            const firework = document.createElement("div");
-            firework.className = "firework";
-            firework.style.left = Math.random() * 100 + "vw";
-            firework.style.top = Math.random() * 100 + "vh";
-            
-            // Random colors for fireworks
-            const colors = ['#FF69B4', '#00FFFF', '#FFD700', '#FF4500', '#7CFC00', '#9400D3'];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            firework.style.backgroundColor = randomColor;
-            firework.style.boxShadow = `0 0 5px 2px ${randomColor}`;
-            
-            document.body.appendChild(firework);
-
-            // Remove firework after animation
+            // Remove after animation completes
             setTimeout(() => {
                 firework.remove();
             }, 1500);
         };
-
+        
+        // Create confetti
+        const createConfetti = () => {
+            const colors = [
+                '#FF3E9D', '#0CF2FF', '#FFD639', '#FF8C00', 
+                '#39FF14', '#9B30FF', '#FF1493', '#00FFFF'
+            ];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.width = `${5 + Math.random() * 10}px`;
+                    confetti.style.height = `${10 + Math.random() * 15}px`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = `${3 + Math.random() * 5}s`;
+                    
+                    document.getElementById('backgroundElements').appendChild(confetti);
+                    
+                    // Remove after animation completes
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 8000);
+                }, i * 100);
+            }
+        };
+        
+        // Create surprise peek element during countdown
+        const createSurprisePeek = () => {
+            const elements = ['🎁', '🎈', '🎉', '🎊', '✨', '🎂', '🥳', '🎇', '🎆'];
+            const element = elements[Math.floor(Math.random() * elements.length)];
+            
+            const peek = document.createElement('div');
+            peek.className = 'surprise-peek';
+            peek.textContent = element;
+            peek.style.left = `${Math.random() * 90 + 5}vw`;
+            peek.style.top = `${Math.random() * 90 + 5}vh`;
+            
+            document.getElementById('backgroundElements').appendChild(peek);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                peek.remove();
+            }, 1000);
+        };
+        
         // Launch multiple fireworks
         const launchFireworks = () => {
             for (let i = 0; i < 15; i++) {
                 setTimeout(createFirework, i * 300);
             }
         };
-
-        // Execute the birthday hack
-        const executeHack = () => {
-            playSound("button");
+        
+        // ===== MAIN FUNCTIONALITY =====
+        
+        // Access level variable
+        let accessLevel = "";
+        
+        // Unlock the initial screen
+        const unlockScreen = () => {
+            playSound('unlock', 0.8);
             
-            const name = document.getElementById("name").value;
-            const age = document.getElementById("age").value;
+            const lockScreen = document.getElementById('lockScreen');
+            lockScreen.style.transform = 'translateY(-100%)';
+            
+            setTimeout(() => {
+                lockScreen.style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                
+                // Play startup sound
+                setTimeout(() => {
+                    playSound('startup', 0.7);
+                }, 500);
+            }, 500);
+            
+            // Initialize audio as user has interacted
+            initAudio();
+        };
+        
+        // Select access level
+        const selectAccess = (level) => {
+            playSound('click', 0.5);
+            
+            accessLevel = level;
+            const buttons = document.querySelectorAll('.button-group button:not(.primary)');
+            
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(level.toLowerCase())) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        };
+        
+        // Start the surprise countdown
+        const startCountdown = () => {
+            playSound('alert', 0.6);
+            
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
             
             if (!name) {
-                alert("We need the birthday star's name to start the mission!");
+                alert("Please enter the birthday person's name to continue!");
                 return;
             }
             
-            // Hide the form
-            document.getElementById("birthdayForm").style.display = "none";
+            // Hide the form and show countdown
+            document.getElementById('birthdayForm').style.display = 'none';
             
-            // Show hacking progress
-            const hackOutput = document.getElementById("hackOutput");
-            hackOutput.style.opacity = "1";
+            const countdownSection = document.getElementById('countdownSection');
+            countdownSection.classList.add('active');
+            countdownSection.innerHTML = '<h2>SURPRISE LAUNCH SEQUENCE INITIATED</h2>';
             
-            const commands = [
-                "🔍 Scanning for birthday data...",
-                "🔐 Unlocking special surprise vault...",
-                "🎁 Collecting digital presents...",
-                "🎂 Baking virtual cake...",
-                "🎯 Target birthday star identified: " + name,
-                "🎨 Preparing colorful decorations...",
-                "🎮 Loading celebration mini-games...",
-                "🎪 Setting up virtual party space...",
-                "🚀 Launching celebration in 3...",
-                "🚀 2...",
-                "🚀 1...",
-                "🎉 BIRTHDAY MISSION SUCCESSFUL! 🎉"
+            // Start countdown
+            const countdownNumbers = ['5️⃣', '4️⃣', '3️⃣', '2️⃣', '1️⃣', '🎉'];
+            const countdownText = [
+                'Preparing celebration protocols...',
+                'Loading special birthday algorithms...',
+                'Activating surprise systems...',
+                'Charging happiness generators...',
+                'Finalizing birthday sequence...',
+                'SURPRISE ACTIVATED!'
             ];
             
-            // Animate typing commands
-            let i = 0;
-            const interval = setInterval(() => {
-                if (i < commands.length) {
-                    playSound("keyboard");
-                    hackOutput.innerHTML += commands[i] + "<br>";
-                    hackOutput.scrollTop = hackOutput.scrollHeight;
-                    i++;
+            for (let i = 0; i < countdownNumbers.length; i++) {
+                setTimeout(() => {
+                    // Add countdown number
+                    const numberDiv = document.createElement('div');
+                    numberDiv.className = 'command-line';
+                    numberDiv.innerHTML = `<span style="font-size: 2rem;">${countdownNumbers[i]}</span> ${countdownText[i]}`;
+                    countdownSection.appendChild(numberDiv);
+                    countdownSection.scrollTop = countdownSection.scrollHeight;
                     
-                    // Play success sound on last command
-                    if (i === commands.length) {
+                    // Play countdown sound for numbers, success sound for last one
+                    if (i < countdownNumbers.length - 1) {
+                        playSound('countdown', 0.6);
+                        createSurprisePeek();
+                    } else {
+                        playSound('surprise', 0.8);
                         setTimeout(() => {
-                            playSound("success");
-                        }, 300);
+                            playSound('cheer', 0.5);
+                            playSound('trumpet', 0.6);
+                        }, 500);
+                        
+                        // Show birthday message after the last countdown
+                        setTimeout(() => {
+                            showBirthdayMessage(name, age);
+                        }, 1500);
                     }
-                } else {
-                    clearInterval(interval);
-                    showBirthdayMessage(name, age);
-                }
-            }, 800);
+                }, i * 1500);
+            }
         };
         
         // Show the birthday message
         const showBirthdayMessage = (name, age) => {
-            // Play the birthday song
-            stopAllSounds();
-            setTimeout(() => {
-                playSound("birthday");
-            }, 500);
+            // Hide countdown, show birthday message
+            document.getElementById('countdownSection').style.display = 'none';
+            const birthdayMessage = document.getElementById('birthdayMessage');
+            birthdayMessage.style.display = 'block';
             
-            // Clear terminal content
-            document.querySelector(".terminal").innerHTML = "";
-            
-            // Create new birthday message
-            const birthdayMessage = document.createElement("div");
-            birthdayMessage.style.textAlign = "center";
-            
-            // Add balloons
-            let message = `<div class="balloons">
-                            <div class="balloon">🎈</div>
-                            <div class="balloon">🎈</div>
-                            <div class="balloon">🎈</div>
-                            <div class="balloon">🎈</div>
-                            <div class="balloon">🎈</div>
-                           </div>`;
-            
-            // Add message based on access level
-            message += `<h1 class="glitch">MISSION ACCOMPLISHED!</h1>`;
-            message += `<div class="cake">🎂</div>`;
-            message += `<h1>Happy Birthday, ${name}!</h1>`;
-            
-            if (age) {
-                message += `<p style="font-size: 1.2em;">Woohoo! You're ${age} years awesome today!</p>`;
-                
-                // Add gifts with number based on age (max 5)
-                message += `<div>`;
-                for (let i = 0; i < Math.min(age, 5); i++) {
-                    message += `<span class="gift">🎁</span>`;
-                }
-                message += `</div>`;
-            }
-            
-            switch(accessLevel) {
-                case "friend":
-                    message += `<p style="font-size: 1.2em;">You've reached Level ${age} in the Game of Life! 🎮</p>
-                                <p>Your special friend powers make you the coolest kid around!</p>
-                                <p>May all your wishes come true faster than any computer can calculate!</p>`;
-                    break;
-                case "family":
-                    message += `<p style="font-size: 1.2em;">Our family's superhero is ${age} today! 👪</p>
-                                <p>You make our family team the happiest place in the world!</p>
-                                <p>Sending you a million billion hugs and kisses today!</p>`;
-                    break;
-                case "bestie":
-                    message += `<p style="font-size: 1.2em;">Best friends forever means celebrating ALL your ${age} years! 💖</p>
-                                <p>You're my player 2 in this awesome game of life!</p>
-                                <p>Let's keep having epic adventures together forever!</p>`;
-                    break;
-                default:
-                    message += `<p style="font-size: 1.2em;">May your day be filled with fun and games!</p>
-                                <p>Wishing you the biggest slice of happiness cake ever!</p>`;
-            }
-            
-            message += `<p style="font-size: 1.3em; margin-top: 20px;">🎮 MISSION COMPLETE: Have the most AMAZING birthday ever! 🎮</p>`;
-            message += `<button onclick="restartHack()" style="font-size: 1.2em;">NEW MISSION 🚀</button>`;
-            
-            birthdayMessage.innerHTML = message;
-            document.querySelector(".terminal").appendChild(birthdayMessage);
-            
-            // Launch fireworks
+            // Create celebratory effects
+            createConfetti();
             launchFireworks();
             
-            // Repeat fireworks
-            setInterval(launchFireworks, 5000);
+            // Play birthday music
+            setTimeout(() => {
+                playSound('birthday', 0.7);
+            }, 1000);
+            
+            // Build the message based on access level
+            let message = `
+                <div class="birthday-message">
+                    <div class="balloons">
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                    </div>
+                    
+                    <div class="surprise-reveal">SURPRISE!!!</div>
+                    
+                    <div class="cake">🎂</div>
+                    
+                    <h1>Happy Birthday, ${name}!</h1>
+            `;
+            
+            if (age) {
+                message += `<h2>Congratulations on turning ${age}! 🎉</h2>`;
+            }
+            
+            // Personalized message based on relationship
+            switch(accessLevel) {
+                case "friend":
+                    message += `
+                        <p>As your friend, I want you to know that you make every day more awesome!</p>
+                        <p>May your special day be filled with fun, laughter, and all your favorite things.</p>
+                        <p>You're the coolest friend anyone could wish for! Let's make this your best year yet!</p>
+                    `;
+                    break;
+                case "family":
+                    message += `
+                        <p>To my amazing family member who lights up our lives every single day.</p>
+                        <p>Our family wouldn't be the same without your smile, laughter, and love.</p>
+                        <p>We love you to the moon and back! Today is all about celebrating YOU!</p>
+                    `;
+                    break;
+                case "bestie":
+                    message += `
+                        <p>To my absolute BEST friend in the whole wide world!</p>
+                        <p>You're the most amazing, incredible, fantastic person I know.</p>
+                        <p>Thank you for being the kind of friend everyone dreams of having!</p>
+                        <p>Let's make today the most epic celebration ever!</p>
+                    `;
+                    break;
+                default:
+                    message += `
+                        <p>Wishing you the happiest of birthdays filled with joy and laughter!</p>
+                        <p>May all your wishes come true on this special day!</p>
+                    `;
+            }
+            
+            // Add final celebration elements
+            message += `
+                <div style="margin-top: 30px;">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🎁 🎉 🎊 🎈 🎂 🎈 🎊 🎉 🎁</div>
+                    <p style="font-weight: bold; font-size: 1.2rem;">Your day should be as amazing as YOU are!</p>
+                </div>
+                
+                <div class="button-group" style="margin-top: 30px;">
+                    <button onclick="restartSurprise()">SEND AGAIN 🔄</button>
+                    <button onclick="toggleBirthdayMusic()">MUSIC 🎵</button>
+                </div>
+            `;
+            
+            birthdayMessage.innerHTML = message;
+            
+            // Start continuous celebration effects
+            startCelebrationEffects();
         };
         
-        // Restart the hack
-        const restartHack = () => {
-            playSound("button");
+        // Toggle birthday music
+        let musicPlaying = true;
+        const toggleBirthdayMusic = () => {
+            musicPlaying = !musicPlaying;
+            
+            if (musicPlaying) {
+                playSound('birthday', 0.7);
+            } else {
+                sounds['birthday'].pause();
+            }
+            
+            playSound('click', 0.5);
+        };
+        
+        // Start continuous celebration effects
+        let celebrationInterval;
+        const startCelebrationEffects = () => {
+            // Initial fireworks and confetti
+            launchFireworks();
+            
+            // Continue with periodic effects
+            celebrationInterval = setInterval(() => {
+                if (Math.random() > 0.5) {
+                    launchFireworks();
+                }
+                
+                if (Math.random() > 0.7) {
+                    createConfetti();
+                }
+            }, 5000);
+        };
+        
+        // Restart the surprise
+        const restartSurprise = () => {
+            playSound('click', 0.5);
             stopAllSounds();
+            clearInterval(celebrationInterval);
             location.reload();
         };
         
-        // Attempt to preload sounds to fix issues
-        window.addEventListener('load', function() {
-            // Try to interact with sounds after a user gesture
-            document.body.addEventListener('click', function() {
-                // Try to play and immediately pause all sounds to "wake them up"
+        // Add event listeners when document is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add click listener to initialize audio
+            document.body.addEventListener('click', initAudio, { once: true });
+            
+            // Preload sounds after a slight delay
+            setTimeout(() => {
                 for (const sound of Object.values(sounds)) {
-                    sound.play().then(() => {
-                        sound.pause();
-                        sound.currentTime = 0;
-                    }).catch(e => {
-                        // Autoplay might still be blocked, but that's okay
-                        console.log("Initial sound interaction error:", e);
-                    });
+                    try {
+                        sound.load();
+                    } catch (e) {
+                        console.log("Error preloading sound:", e);
+                    }
                 }
-            }, { once: true });
+            }, 1000);
         });
     </script>
 </body>
