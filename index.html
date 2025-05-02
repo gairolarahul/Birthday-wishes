@@ -382,48 +382,127 @@
             box-shadow: 0 0 10px var(--secondary-color);
         }
         
-        /* Special song notification */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .special-song-notification {
-            animation: appearFade 0.5s ease-in, float 4s infinite ease-in-out;
-        }
-        
-        @keyframes appearFade {
-            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        
-        /* Audio controls */
-        .audio-controls {
-            margin-top: 20px;
+        /* Custom music player styling */
+        .custom-music-player {
+            margin-top: 30px;
             padding: 15px;
             background: rgba(0,0,0,0.4);
-            border-radius: 15px;
             border: 2px solid var(--primary-color);
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+            border-radius: 15px;
+            text-align: center;
+            animation: glow 2s infinite alternate;
         }
         
-        .audio-title {
-            font-weight: bold;
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--primary-color); }
+            100% { box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--secondary-color); }
+        }
+        
+        .music-title {
+            font-size: 1.3rem;
             margin-bottom: 10px;
             color: var(--accent-color);
         }
         
-        .audio-buttons {
+        .music-controls-custom {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .music-controls-custom button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            min-width: unset;
+        }
+        
+        .music-progress {
+            height: 8px;
+            width: 100%;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .music-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        
+        .music-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .music-notes {
+            position: relative;
+            height: 30px;
+            margin: 10px 0;
+        }
+        
+        .music-note {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            top: 0;
+            animation: float-note 2s linear forwards;
+        }
+        
+        @keyframes float-note {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-30px); opacity: 0; }
         }
         
         .volume-control {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            cursor: pointer;
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            cursor: pointer;
+            border: none;
         }
         
         /* Responsive adjustments */
@@ -436,6 +515,7 @@
             .lock-icon { font-size: 4rem; }
             .terminal::before { font-size: 1rem; }
             .sound-button { width: 40px; height: 40px; font-size: 1.2rem; }
+            .music-title { font-size: 1.1rem; }
         }
         
         @media (max-width: 480px) {
@@ -450,6 +530,7 @@
             .unlock-btn { font-size: 1rem; padding: 12px 25px; }
             .terminal { padding: 15px; }
             .terminal::before { font-size: 0.9rem; padding: 8px; }
+            .music-title { font-size: 1rem; }
         }
     </style>
 </head>
@@ -505,149 +586,122 @@
     <div class="sound-button" onclick="toggleSound()" id="soundToggle">🔊</div>
 
     <!-- Audio elements -->
-    <!-- Regular effects -->
-    <audio id="unlockSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
-    <audio id="startupSound" src="https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3" preload="auto"></audio>
-    <audio id="keypressSound" src="https://assets.mixkit.co/active_storage/sfx/2688/2688-preview.mp3" preload="auto"></audio>
-    <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2867/2867-preview.mp3" preload="auto"></audio>
-    <audio id="countdownSound" src="https://assets.mixkit.co/active_storage/sfx/254/254-preview.mp3" preload="auto"></audio>
-    <audio id="surpriseSound" src="https://assets.mixkit.co/active_storage/sfx/2005/2005-preview.mp3" preload="auto"></audio>
-    <audio id="fireworkSound" src="https://assets.mixkit.co/active_storage/sfx/1393/1393-preview.mp3" preload="auto"></audio>
-    <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2675/2675-preview.mp3" preload="auto"></audio>
-    
-    <!-- Birthday song -->
-    <audio id="birthdaySong" preload="auto" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_84e5bd1879.mp3?filename=happy-birthday-instrumental-hip-hop-128-bpm-9388.mp3" type="audio/mpeg">
+    <audio id="customBirthdaySong" preload="auto" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2023/08/22/audio_bc19dce97d.mp3?filename=happy-birthday-music-box-special-edition-with-effects-179721.mp3" type="audio/mpeg">
     </audio>
+    
+    <!-- YouTube Embed (hidden initially) -->
+    <div id="youtubePlayerContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center;">
+        <div style="position: relative; width: 80%; max-width: 640px;">
+            <button id="closeYoutubeBtn" style="position: absolute; top: -40px; right: 0; background: var(--accent-color); border: none; color: #000; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 2001;">✖</button>
+            <div id="youtubePlayer" style="width: 100%; aspect-ratio: 16/9;"></div>
+        </div>
+    </div>
 
     <script>
-        // Global variables
+        // ===== SOUND SYSTEM =====
+        
+        // Create audio elements programmatically
+        const soundEffects = {
+            unlock: "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3", // Door unlock sound
+            startup: "https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3", // Computer startup
+            keypress: "https://assets.mixkit.co/active_storage/sfx/2688/2688-preview.mp3", // Keyboard typing
+            alert: "https://assets.mixkit.co/active_storage/sfx/2867/2867-preview.mp3", // Alert beep
+            countdown: "https://assets.mixkit.co/active_storage/sfx/254/254-preview.mp3", // Countdown beep
+            success: "https://assets.mixkit.co/active_storage/sfx/1343/1343-preview.mp3", // Success sound
+            surprise: "https://assets.mixkit.co/active_storage/sfx/2005/2005-preview.mp3", // Surprise reveal
+            firework: "https://assets.mixkit.co/active_storage/sfx/1393/1393-preview.mp3", // Firework explosion
+            cheer: "https://assets.mixkit.co/active_storage/sfx/535/535-preview.mp3", // Crowd cheering
+            trumpet: "https://assets.mixkit.co/active_storage/sfx/976/976-preview.mp3", // Trumpet fanfare
+            birthday: "https://assets.mixkit.co/active_storage/sfx/531/531-preview.mp3", // Birthday music
+            birthdaySong: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=happy-birthday-tropical-house-version-1-16104.mp3", // Royalty-free happy birthday song
+            click: "https://assets.mixkit.co/active_storage/sfx/2675/2675-preview.mp3" // Button click
+        };
+        
+        // Create audio elements and store them
+        const sounds = {};
+        for (const [key, url] of Object.entries(soundEffects)) {
+            const audio = new Audio(url);
+            if (key === 'birthday' || key === 'birthdaySong') {
+                audio.loop = true;
+            }
+            sounds[key] = audio;
+        }
+        
+        // Sound control variables
         let soundEnabled = true;
-        let accessLevel = "";
+        let audioContext = null;
         
-        // ===== AUDIO SYSTEM =====
-        
-        // Initialize audio to unlock for iOS/Safari
+        // Initialize AudioContext on first user interaction
         const initAudio = () => {
-            // Play a silent sound to unlock audio
-            try {
-                // Create and set up a short silent sound
-                const silentSound = new Audio();
-                silentSound.src = "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjIwLjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABNgCpqampqampqampqampqampqampqampqampqampqampqampqampqampqampqampqamp//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjM1AAAAAAAAAAAAAAAAJAYAAAAAAAAAATbbLa72AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-                silentSound.volume = 0.01;
-                silentSound.play().catch(err => console.log("Audio init error:", err));
-                
-                // Try to play all sounds with very low volume to unlock them
-                document.querySelectorAll('audio').forEach(audio => {
-                    audio.volume = 0.01;
-                    audio.play().catch(() => {});
-                    audio.pause();
-                    audio.currentTime = 0;
-                });
-            } catch (e) {
-                console.log("Audio initialization error:", e);
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Try to play a silent sound to unlock audio on iOS
+                    const silentSound = audioContext.createOscillator();
+                    silentSound.frequency.value = 0;
+                    silentSound.connect(audioContext.destination);
+                    silentSound.start(0);
+                    silentSound.stop(0.001);
+                } catch (e) {
+                    console.log("Audio context could not be created:", e);
+                }
             }
         };
         
-        // Play a sound with error handling
-        const playSound = (soundId, volume = 0.8) => {
-            if (!soundEnabled) return;
-            
-            try {
-                const sound = document.getElementById(soundId);
-                if (!sound) return;
-                
-                // Reset to beginning if already playing
-                sound.currentTime = 0;
-                sound.volume = volume;
-                
-                // Play with promise handling for modern browsers
-                const playPromise = sound.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log(`Error playing ${soundId}:`, error);
-                        
-                        // Try one more time after user interaction
-                        document.body.addEventListener('click', () => {
-                            sound.play().catch(() => {});
-                        }, { once: true });
-                    });
+        // Play sound with volume control and error handling
+        const playSound = (soundKey, volume = 1.0) => {
+            if (soundEnabled && sounds[soundKey]) {
+                try {
+                    // Ensure audio is initialized
+                    initAudio();
+                    
+                    // Reset the sound to the beginning if it's already playing
+                    sounds[soundKey].currentTime = 0;
+                    sounds[soundKey].volume = volume;
+                    
+                    // Try to play the sound
+                    const playPromise = sounds[soundKey].play();
+                    
+                    // Handle the play promise
+                    if (playPromise !== undefined) {
+                        playPromise.catch(e => {
+                            console.log(`Sound play error (${soundKey}):`, e);
+                            // If autoplay is blocked, we'll try again after a user gesture
+                            document.body.addEventListener('click', () => {
+                                sounds[soundKey].play().catch(() => {});
+                            }, { once: true });
+                        });
+                    }
+                } catch (e) {
+                    console.log(`Error playing ${soundKey}:`, e);
                 }
-            } catch (error) {
-                console.log(`Error with sound ${soundId}:`, error);
             }
         };
         
         // Stop all sounds
         const stopAllSounds = () => {
-            document.querySelectorAll('audio').forEach(audio => {
+            for (const sound of Object.values(sounds)) {
                 try {
-                    audio.pause();
-                    audio.currentTime = 0;
+                    sound.pause();
+                    sound.currentTime = 0;
                 } catch (e) {
                     console.log("Error stopping sound:", e);
                 }
-            });
+            }
         };
         
         // Toggle sound on/off
         const toggleSound = () => {
             soundEnabled = !soundEnabled;
-            
             const soundToggle = document.getElementById('soundToggle');
             if (!soundEnabled) {
                 stopAllSounds();
                 soundToggle.textContent = "🔇";
             } else {
                 soundToggle.textContent = "🔊";
-                playSound("clickSound", 0.5);
+                playSound('click', 0.5);
             }
-        };
-        
-        // Play birthday song
-        const playBirthdaySong = () => {
-            if (!soundEnabled) return;
-            
-            const birthdaySong = document.getElementById('birthdaySong');
-            birthdaySong.volume = 0.8;
-            birthdaySong.play().catch(error => {
-                console.log("Error playing birthday song:", error);
-                
-                // Show error message to user
-                const notification = document.createElement('div');
-                notification.style = "position: fixed; bottom: 20px; left: 20px; background: #FF3E9D; color: white; padding: 10px; border-radius: 10px; z-index: 9999;";
-                notification.innerHTML = "Please click anywhere to enable the birthday song! 🎵";
-                document.body.appendChild(notification);
-                
-                // Try again after user click
-                document.body.addEventListener('click', () => {
-                    birthdaySong.play().catch(() => {});
-                    notification.remove();
-                }, { once: true });
-            });
-            
-            // Add floating notification
-            showBirthdaySongNotification();
-        };
-        
-        // Show birthday song notification
-        const showBirthdaySongNotification = () => {
-            const notification = document.createElement('div');
-            notification.className = 'special-song-notification';
-            notification.innerHTML = `
-                <div style="position: fixed; bottom: 20px; left: 20px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); padding: 15px; border-radius: 15px; box-shadow: 0 0 20px rgba(255,255,255,0.3); z-index: 1000; animation: float 3s infinite ease-in-out; max-width: 300px;">
-                    <div style="font-weight: bold; margin-bottom: 5px;">🎵 Now Playing: 🎵</div>
-                    <div>Special Birthday Song</div>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Remove notification after some time
-            setTimeout(() => {
-                notification.remove();
-            }, 10000);
         };
         
         // ===== VISUAL EFFECTS =====
@@ -670,7 +724,7 @@
             
             // Play firework sound randomly
             if (Math.random() > 0.7) {
-                playSound('fireworkSound', 0.4);
+                playSound('firework', 0.4);
             }
             
             // Remove after animation completes
@@ -732,11 +786,55 @@
             }
         };
         
+        // ===== CUSTOM SONG PLAYER =====
+        
+        // Create floating music notes animation
+        const createMusicNote = (container) => {
+            const notes = ['♪', '♫', '♩', '♬', '🎵', '🎶'];
+            const note = document.createElement('div');
+            note.className = 'music-note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = `${Math.random() * 100}%`;
+            note.style.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
+            container.appendChild(note);
+            
+            setTimeout(() => {
+                note.remove();
+            }, 2000);
+        };
+        
+        // Start music notes animation
+        let notesInterval;
+        const startNotesAnimation = (container) => {
+            // Clear any existing interval
+            if (notesInterval) clearInterval(notesInterval);
+            
+            // Create new interval
+            notesInterval = setInterval(() => {
+                createMusicNote(container);
+            }, 300);
+        };
+        
+        // Stop music notes animation
+        const stopNotesAnimation = () => {
+            clearInterval(notesInterval);
+        };
+        
+        // Format time for music player
+        const formatTime = (seconds) => {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        };
+        
         // ===== MAIN FUNCTIONALITY =====
+        
+        // Access level variable
+        let accessLevel = "";
         
         // Unlock the initial screen
         const unlockScreen = () => {
-            playSound('unlockSound');
+            playSound('unlock', 0.8);
             
             const lockScreen = document.getElementById('lockScreen');
             lockScreen.style.transform = 'translateY(-100%)';
@@ -747,7 +845,7 @@
                 
                 // Play startup sound
                 setTimeout(() => {
-                    playSound('startupSound', 0.7);
+                    playSound('startup', 0.7);
                 }, 500);
             }, 500);
             
@@ -757,7 +855,7 @@
         
         // Select access level
         const selectAccess = (level) => {
-            playSound('clickSound', 0.5);
+            playSound('click', 0.5);
             
             accessLevel = level;
             const buttons = document.querySelectorAll('.button-group button:not(.primary)');
@@ -773,7 +871,7 @@
         
         // Start the surprise countdown
         const startCountdown = () => {
-            playSound('alertSound', 0.6);
+            playSound('alert', 0.6);
             
             const name = document.getElementById('name').value;
             const age = document.getElementById('age').value;
@@ -801,7 +899,6 @@
                 'SURPRISE ACTIVATED!'
             ];
             
-            // Run the countdown sequence
             for (let i = 0; i < countdownNumbers.length; i++) {
                 setTimeout(() => {
                     // Add countdown number
@@ -813,23 +910,202 @@
                     
                     // Play countdown sound for numbers, success sound for last one
                     if (i < countdownNumbers.length - 1) {
-                        playSound('countdownSound', 0.6);
+                        playSound('countdown', 0.6);
                         createSurprisePeek();
                     } else {
-                        // Last countdown item - play surprise sound then special song
-                        playSound('surpriseSound', 0.8);
-                        
-                        // Show birthday message after a short delay
+                        playSound('surprise', 0.8);
                         setTimeout(() => {
-                            // Play the special birthday song immediately when "SURPRISE ACTIVATED!" appears
-                            playBirthdaySong();
-                            
-                            // Then show the birthday message
+                            playSound('cheer', 0.5);
+                            playSound('trumpet', 0.6);
+                        }, 500);
+                        
+                        // Show birthday message after the last countdown
+                        setTimeout(() => {
                             showBirthdayMessage(name, age);
-                        }, 1000);
+                        }, 1500);
                     }
                 }, i * 1500);
             }
+        };
+        
+        // Create custom music player for Happy Birthday song
+        const createCustomMusicPlayer = (name) => {
+            const playerContainer = document.createElement('div');
+            playerContainer.className = 'custom-music-player';
+            
+            // Get the custom birthday song
+            const customSong = document.getElementById('customBirthdaySong');
+            
+            // Create player elements
+            const playerHTML = `
+                <div class="music-title">🎵 Happy Birthday ${name}! 🎵</div>
+                <div class="music-notes" id="musicNotes"></div>
+                <div class="music-progress" id="musicProgress">
+                    <div class="music-progress-bar" id="musicProgressBar"></div>
+                </div>
+                <div class="music-time">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+                <div class="music-controls-custom">
+                    <button id="playBtn">▶️</button>
+                    <button id="pauseBtn">⏸️</button>
+                    <button id="restartBtn">🔄</button>
+                </div>
+                <div class="volume-control">
+                    <span>🔈</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+                    <span>🔊</span>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button id="specialSongBtn" style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 12px 25px; font-size: 1.1rem; min-width: 200px; animation: pulse 2s infinite;" onclick="showYouTubePlayer()">
+                        🎵 Play Special Birthday Song 🎵
+                    </button>
+                </div>
+            `;
+            
+            playerContainer.innerHTML = playerHTML;
+            
+            // Return the player element to be added to the DOM
+            return playerContainer;
+        };
+        
+        // Load YouTube API
+        const loadYouTubeAPI = () => {
+            if (!window.YT) { // If YouTube API is not loaded yet
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            }
+        };
+        
+        // Initialize YouTube player
+        let youtubePlayer;
+        window.onYouTubeIframeAPIReady = () => {
+            youtubePlayer = new YT.Player('youtubePlayer', {
+                height: '360',
+                width: '640',
+                videoId: 'OOaj7xUqPUM',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 1,
+                    'rel': 0,
+                    'showinfo': 0,
+                    'modestbranding': 1
+                }
+            });
+        };
+        
+        // Show YouTube video player
+        const showYouTubePlayer = () => {
+            const container = document.getElementById('youtubePlayerContainer');
+            container.style.display = 'flex';
+            
+            if (youtubePlayer && youtubePlayer.playVideo) {
+                youtubePlayer.playVideo();
+            }
+            
+            // Pause the custom song when YouTube is playing
+            const customSong = document.getElementById('customBirthdaySong');
+            if (customSong) {
+                customSong.pause();
+            }
+        };
+        
+        // Close YouTube player
+        const closeYouTubePlayer = () => {
+            const container = document.getElementById('youtubePlayerContainer');
+            container.style.display = 'none';
+            
+            if (youtubePlayer && youtubePlayer.pauseVideo) {
+                youtubePlayer.pauseVideo();
+            }
+        };
+
+        // Initialize custom music player functionality
+        const initMusicPlayer = () => {
+            // Get elements
+            const customSong = document.getElementById('customBirthdaySong');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const musicProgress = document.getElementById('musicProgress');
+            const musicProgressBar = document.getElementById('musicProgressBar');
+            const currentTime = document.getElementById('currentTime');
+            const totalTime = document.getElementById('totalTime');
+            const musicNotes = document.getElementById('musicNotes');
+            
+            // Load YouTube API
+            loadYouTubeAPI();
+            
+            // Set initial volume
+            customSong.volume = volumeSlider.value / 100;
+            
+            // Add event listeners
+            playBtn.addEventListener('click', () => {
+                stopAllSounds(); // Stop any other sounds
+                customSong.play();
+                startNotesAnimation(musicNotes);
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                customSong.pause();
+                stopNotesAnimation();
+            });
+            
+            restartBtn.addEventListener('click', () => {
+                customSong.currentTime = 0;
+                customSong.play();
+            });
+            
+            volumeSlider.addEventListener('input', () => {
+                customSong.volume = volumeSlider.value / 100;
+            });
+            
+            // Setup YouTube close button
+            document.getElementById('closeYoutubeBtn').addEventListener('click', closeYouTubePlayer);
+            
+            // Update progress bar
+            customSong.addEventListener('timeupdate', () => {
+                const percent = (customSong.currentTime / customSong.duration) * 100;
+                musicProgressBar.style.width = `${percent}%`;
+                currentTime.textContent = formatTime(customSong.currentTime);
+                
+                // Generate music notes randomly while playing
+                if(!customSong.paused && Math.random() > 0.9) {
+                    createMusicNote(musicNotes);
+                }
+            });
+            
+            // Allow seeking
+            musicProgress.addEventListener('click', (e) => {
+                const percent = e.offsetX / musicProgress.offsetWidth;
+                customSong.currentTime = percent * customSong.duration;
+            });
+            
+            // Set total time once metadata is loaded
+            customSong.addEventListener('loadedmetadata', () => {
+                totalTime.textContent = formatTime(customSong.duration);
+            });
+            
+            // Handle song ending
+            customSong.addEventListener('ended', () => {
+                // If song ends, restart it after a short delay
+                setTimeout(() => {
+                    customSong.currentTime = 0;
+                    customSong.play();
+                }, 2000);
+            });
+            
+            // Play song automatically after a short delay
+            setTimeout(() => {
+                if(soundEnabled) {
+                    customSong.play();
+                    startNotesAnimation(musicNotes);
+                }
+            }, 1000);
         };
         
         // Show the birthday message
@@ -842,6 +1118,9 @@
             // Create celebratory effects
             createConfetti();
             launchFireworks();
+            
+            // Stop all background sounds
+            stopAllSounds();
             
             // Build the message based on access level
             let message = `
@@ -905,22 +1184,8 @@
                 </div>
             `;
             
-            // Add audio controls
-            message += `
-                <div class="audio-controls">
-                    <div class="audio-title">🎵 Special Birthday Song 🎵</div>
-                    <div class="audio-buttons">
-                        <button onclick="document.getElementById('birthdaySong').play()">▶️ Play</button>
-                        <button onclick="document.getElementById('birthdaySong').pause()">⏸️ Pause</button>
-                    </div>
-                    <div class="volume-control">
-                        <span>🔈</span>
-                        <input type="range" min="0" max="100" value="80" style="width: 100%;" 
-                            oninput="document.getElementById('birthdaySong').volume = this.value/100">
-                        <span>🔊</span>
-                    </div>
-                </div>
-            `;
+            // Add custom music player
+            message += `<div id="customPlayerContainer"></div>`;
             
             // Add final celebration elements
             message += `
@@ -936,8 +1201,30 @@
             
             birthdayMessage.innerHTML = message;
             
+            // Add the custom music player to the container
+            const playerContainer = document.getElementById('customPlayerContainer');
+            playerContainer.appendChild(createCustomMusicPlayer(name));
+            
+            // Initialize the player functionality
+            initMusicPlayer();
+            
             // Start continuous celebration effects
             startCelebrationEffects();
+        };
+        
+        // Toggle birthday music
+        let musicPlaying = true;
+        const toggleBirthdayMusic = () => {
+            musicPlaying = !musicPlaying;
+            const customSong = document.getElementById('customBirthdaySong');
+            
+            if (musicPlaying) {
+                customSong.play();
+            } else {
+                customSong.pause();
+            }
+            
+            playSound('click', 0.5);
         };
         
         // Start continuous celebration effects
@@ -960,33 +1247,28 @@
         
         // Restart the surprise
         const restartSurprise = () => {
-            playSound('clickSound', 0.5);
+            playSound('click', 0.5);
             stopAllSounds();
-            
-            // Clear periodic effects
-            if (celebrationInterval) {
-                clearInterval(celebrationInterval);
-            }
-            
-            // Reload the page to restart everything
+            clearInterval(celebrationInterval);
+            stopNotesAnimation();
             location.reload();
         };
-        
-        // ===== INITIALIZATION =====
         
         // Add event listeners when document is loaded
         document.addEventListener('DOMContentLoaded', () => {
             // Add click listener to initialize audio
             document.body.addEventListener('click', initAudio, { once: true });
             
-            // Preload sounds
-            document.querySelectorAll('audio').forEach(audio => {
-                try {
-                    audio.load();
-                } catch (e) {
-                    console.log("Error preloading sound:", e);
+            // Preload sounds after a slight delay
+            setTimeout(() => {
+                for (const sound of Object.values(sounds)) {
+                    try {
+                        sound.load();
+                    } catch (e) {
+                        console.log("Error preloading sound:", e);
+                    }
                 }
-            });
+            }, 1000);
         });
     </script>
 </body>
