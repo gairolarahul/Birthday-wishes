@@ -676,8 +676,8 @@
         </div>
     </div>
     
-    <!-- Sound control button -->
-    <div class="sound-button" onclick="toggleSound()" id="soundToggle">🔊</div>
+    <!-- Sound control button - removed as requested -->
+    <!--<div class="sound-button" onclick="toggleSound()" id="soundToggle">🔊</div>-->
 
     <!-- Audio elements -->
     <audio id="customBirthdaySong" preload="auto" loop>
@@ -1315,6 +1315,10 @@
                     
                     <div class="surprise-reveal">SURPRISE!!!</div>
                     
+                    <p style="background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 2px dashed var(--accent-color); margin: 20px 0;">
+                        <span style="font-style: italic; font-weight: bold;">Hint:</span> To unlock your gift card, click the gift button just below the music player and enter the last 4 digits of Rahul's phone number.
+                    </p>
+                    
                     <div class="cake">🎂</div>
                     
                     <h1>Happy Birthday, ${name}!</h1>
@@ -1322,7 +1326,6 @@
             
             if (age) {
                 message += `<h2>Congratulations on turning ${age}! 🎉</h2>`;
-            }
             }
             
             // Add personal message from Rahul Gairola
@@ -1341,7 +1344,6 @@
             message += `
                 <div style="margin-top: 30px;">
                     <div style="font-size: 2rem; margin-bottom: 15px;">🎁 🎉 🎊 🎈 🎂 🎈 🎊 🎉 🎁</div>
-                    <p style="font-weight: bold; font-size: 1.2rem;">Your day should be as amazing as YOU are!</p>
                 </div>
                 
                 <div class="button-group" style="margin-top: 30px;">
