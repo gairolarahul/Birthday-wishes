@@ -836,3 +836,601 @@
                 }
             }
         };
+        
+        // Stop all sounds
+        const stopAllSounds = () => {
+            for (const sound of Object.values(sounds)) {
+                try {
+                    sound.pause();
+                    sound.currentTime = 0;
+                } catch (e) {
+                    console.log("Error stopping sound:", e);
+                }
+            }
+        };
+        
+        // Toggle sound on/off
+        const toggleSound = () => {
+            soundEnabled = !soundEnabled;
+            const soundToggle = document.getElementById('soundToggle');
+            if (!soundEnabled) {
+                stopAllSounds();
+                soundToggle.textContent = "🔇";
+            } else {
+                soundToggle.textContent = "🔊";
+                playSound('click', 0.5);
+            }
+        };
+        
+        // ===== VISUAL EFFECTS =====
+        
+        // Create a firework
+        const createFirework = () => {
+            const colors = [
+                '#FF3E9D', '#0CF2FF', '#FFD639', '#FF8C00', 
+                '#39FF14', '#9B30FF', '#FF1493', '#00FFFF'
+            ];
+            
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${Math.random() * 100}vw`;
+            firework.style.top = `${Math.random() * 100}vh`;
+            firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            firework.style.boxShadow = `0 0 10px 2px ${firework.style.backgroundColor}`;
+            
+            document.getElementById('backgroundElements').appendChild(firework);
+            
+            // Play firework sound randomly
+            if (Math.random() > 0.7) {
+                playSound('firework', 0.4);
+            }
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                firework.remove();
+            }, 1500);
+        };
+        
+        // Create confetti
+        const createConfetti = () => {
+            const colors = [
+                '#FF3E9D', '#0CF2FF', '#FFD639', '#FF8C00', 
+                '#39FF14', '#9B30FF', '#FF1493', '#00FFFF'
+            ];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.width = `${5 + Math.random() * 10}px`;
+                    confetti.style.height = `${10 + Math.random() * 15}px`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = `${3 + Math.random() * 5}s`;
+                    
+                    document.getElementById('backgroundElements').appendChild(confetti);
+                    
+                    // Remove after animation completes
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 8000);
+                }, i * 100);
+            }
+        };
+        
+        // Create surprise peek element during countdown
+        const createSurprisePeek = () => {
+            const elements = ['🎁', '🎈', '🎉', '🎊', '✨', '🎂', '🥳', '🎇', '🎆'];
+            const element = elements[Math.floor(Math.random() * elements.length)];
+            
+            const peek = document.createElement('div');
+            peek.className = 'surprise-peek';
+            peek.textContent = element;
+            peek.style.left = `${Math.random() * 90 + 5}vw`;
+            peek.style.top = `${Math.random() * 90 + 5}vh`;
+            
+            document.getElementById('backgroundElements').appendChild(peek);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                peek.remove();
+            }, 1000);
+        };
+        
+        // Launch multiple fireworks
+        const launchFireworks = () => {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(createFirework, i * 300);
+            }
+        };
+        
+        // ===== CUSTOM SONG PLAYER =====
+        
+        // Create floating music notes animation
+        const createMusicNote = (container) => {
+            const notes = ['♪', '♫', '♩', '♬', '🎵', '🎶'];
+            const note = document.createElement('div');
+            note.className = 'music-note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = `${Math.random() * 100}%`;
+            note.style.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
+            container.appendChild(note);
+            
+            setTimeout(() => {
+                note.remove();
+            }, 2000);
+        };
+        
+        // Start music notes animation
+        let notesInterval;
+        const startNotesAnimation = (container) => {
+            // Clear any existing interval
+            if (notesInterval) clearInterval(notesInterval);
+            
+            // Create new interval
+            notesInterval = setInterval(() => {
+                createMusicNote(container);
+            }, 300);
+        };
+        
+        // Stop music notes animation
+        const stopNotesAnimation = () => {
+            clearInterval(notesInterval);
+        };
+        
+        // Format time for music player
+        const formatTime = (seconds) => {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        };
+        
+        // ===== MAIN FUNCTIONALITY =====
+        
+        // Access level variable
+        let accessLevel = "";
+        
+        // Unlock the initial screen
+        const unlockScreen = () => {
+            playSound('unlock', 0.8);
+            
+            const lockScreen = document.getElementById('lockScreen');
+            lockScreen.style.transform = 'translateY(-100%)';
+            
+            setTimeout(() => {
+                lockScreen.style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                
+                // Play startup sound
+                setTimeout(() => {
+                    playSound('startup', 0.7);
+                }, 500);
+            }, 500);
+            
+            // Initialize audio as user has interacted
+            initAudio();
+        };
+        
+        // Select access level
+        const selectAccess = (level) => {
+            playSound('click', 0.5);
+            
+            accessLevel = level;
+            const buttons = document.querySelectorAll('.button-group button:not(.primary)');
+            
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(level.toLowerCase())) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        };
+        
+        // Start the surprise countdown
+        const startCountdown = () => {
+            playSound('alert', 0.6);
+            
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            
+            if (!name) {
+                alert("Please enter the birthday person's name to continue!");
+                return;
+            }
+            
+            // Hide the form and show countdown
+            document.getElementById('birthdayForm').style.display = 'none';
+            
+            const countdownSection = document.getElementById('countdownSection');
+            countdownSection.classList.add('active');
+            countdownSection.innerHTML = '<h2>SURPRISE LAUNCH SEQUENCE INITIATED</h2>';
+            
+            // Start countdown
+            const countdownNumbers = ['5️⃣', '4️⃣', '3️⃣', '2️⃣', '1️⃣', '🎉'];
+            const countdownText = [
+                'Preparing celebration protocols...',
+                'Loading special birthday algorithms...',
+                'Activating surprise systems...',
+                'Charging happiness generators...',
+                'Finalizing birthday sequence...',
+                'SURPRISE ACTIVATED!'
+            ];
+            
+            for (let i = 0; i < countdownNumbers.length; i++) {
+                setTimeout(() => {
+                    // Add countdown number
+                    const numberDiv = document.createElement('div');
+                    numberDiv.className = 'command-line';
+                    numberDiv.innerHTML = `<span style="font-size: 2rem;">${countdownNumbers[i]}</span> ${countdownText[i]}`;
+                    countdownSection.appendChild(numberDiv);
+                    countdownSection.scrollTop = countdownSection.scrollHeight;
+                    
+                    // Play countdown sound for numbers, success sound for last one
+                    if (i < countdownNumbers.length - 1) {
+                        playSound('countdown', 0.6);
+                        createSurprisePeek();
+                    } else {
+                        playSound('surprise', 0.8);
+                        setTimeout(() => {
+                            playSound('cheer', 0.5);
+                            playSound('trumpet', 0.6);
+                        }, 500);
+                        
+                        // Show birthday message after the last countdown
+                        setTimeout(() => {
+                            showBirthdayMessage(name, age);
+                        }, 1500);
+                    }
+                }, i * 1500);
+            }
+        };
+        
+        // Create custom music player for Happy Birthday song
+        const createCustomMusicPlayer = (name) => {
+            const playerContainer = document.createElement('div');
+            playerContainer.className = 'custom-music-player';
+            
+            // Get the custom birthday song
+            const customSong = document.getElementById('customBirthdaySong');
+            
+            // Create player elements
+            const playerHTML = `
+                <div class="music-title">🎵 Happy Birthday ${name}! 🎵</div>
+                <div class="music-notes" id="musicNotes"></div>
+                <div class="music-progress" id="musicProgress">
+                    <div class="music-progress-bar" id="musicProgressBar"></div>
+                </div>
+                <div class="music-time">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+                <div class="music-controls-custom">
+                    <button id="playBtn">▶️</button>
+                    <button id="pauseBtn">⏸️</button>
+                    <button id="restartBtn">🔄</button>
+                </div>
+                <div class="volume-control">
+                    <span>🔈</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+                    <span>🔊</span>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button id="specialSongBtn" style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 12px 25px; font-size: 1.1rem; min-width: 200px; animation: pulse 2s infinite;" onclick="showYouTubePlayer()">
+                        🎵 Play Special Birthday Song 🎵
+                    </button>
+                </div>
+                <div style="margin-top: 25px; text-align: center;">
+                    <div class="surprise-gift-link" onclick="showGiftForm()">
+                        🎁 Click Here for Birthday Gift Surprise! 🎁
+                    </div>
+                </div>
+            `;
+            
+            playerContainer.innerHTML = playerHTML;
+            
+            // Return the player element to be added to the DOM
+            return playerContainer;
+        };
+        
+        // Load YouTube API
+        const loadYouTubeAPI = () => {
+            if (!window.YT) { // If YouTube API is not loaded yet
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            }
+        };
+        
+        // Initialize YouTube player
+        let youtubePlayer;
+        window.onYouTubeIframeAPIReady = () => {
+            youtubePlayer = new YT.Player('youtubePlayer', {
+                height: '360',
+                width: '640',
+                videoId: 'OOaj7xUqPUM',
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 1,
+                    'rel': 0,
+                    'showinfo': 0,
+                    'modestbranding': 1
+                }
+            });
+        };
+        
+        // Show YouTube video player
+        const showYouTubePlayer = () => {
+            const container = document.getElementById('youtubePlayerContainer');
+            container.style.display = 'flex';
+            
+            if (youtubePlayer && youtubePlayer.playVideo) {
+                youtubePlayer.playVideo();
+            }
+            
+            // Pause the custom song when YouTube is playing
+            const customSong = document.getElementById('customBirthdaySong');
+            if (customSong) {
+                customSong.pause();
+            }
+        };
+        
+        // Close YouTube player
+        const closeYouTubePlayer = () => {
+            const container = document.getElementById('youtubePlayerContainer');
+            container.style.display = 'none';
+            
+            if (youtubePlayer && youtubePlayer.pauseVideo) {
+                youtubePlayer.pauseVideo();
+            }
+        };
+
+        // Initialize custom music player functionality
+        const initMusicPlayer = () => {
+            // Get elements
+            const customSong = document.getElementById('customBirthdaySong');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const musicProgress = document.getElementById('musicProgress');
+            const musicProgressBar = document.getElementById('musicProgressBar');
+            const currentTime = document.getElementById('currentTime');
+            const totalTime = document.getElementById('totalTime');
+            const musicNotes = document.getElementById('musicNotes');
+            
+            // Load YouTube API
+            loadYouTubeAPI();
+            
+            // Set initial volume
+            customSong.volume = volumeSlider.value / 100;
+            
+            // Add event listeners
+            playBtn.addEventListener('click', () => {
+                stopAllSounds(); // Stop any other sounds
+                customSong.play();
+                startNotesAnimation(musicNotes);
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                customSong.pause();
+                stopNotesAnimation();
+            });
+            
+            restartBtn.addEventListener('click', () => {
+                customSong.currentTime = 0;
+                customSong.play();
+            });
+            
+            volumeSlider.addEventListener('input', () => {
+                customSong.volume = volumeSlider.value / 100;
+            });
+            
+            // Setup YouTube close button
+            document.getElementById('closeYoutubeBtn').addEventListener('click', closeYouTubePlayer);
+            
+            // Update progress bar
+            customSong.addEventListener('timeupdate', () => {
+                const percent = (customSong.currentTime / customSong.duration) * 100;
+                musicProgressBar.style.width = `${percent}%`;
+                currentTime.textContent = formatTime(customSong.currentTime);
+                
+                // Generate music notes randomly while playing
+                if(!customSong.paused && Math.random() > 0.9) {
+                    createMusicNote(musicNotes);
+                }
+            });
+            
+            // Allow seeking
+            musicProgress.addEventListener('click', (e) => {
+                const percent = e.offsetX / musicProgress.offsetWidth;
+                customSong.currentTime = percent * customSong.duration;
+            });
+            
+            // Set total time once metadata is loaded
+            customSong.addEventListener('loadedmetadata', () => {
+                totalTime.textContent = formatTime(customSong.duration);
+            });
+            
+            // Handle song ending
+            customSong.addEventListener('ended', () => {
+                // If song ends, restart it after a short delay
+                setTimeout(() => {
+                    customSong.currentTime = 0;
+                    customSong.play();
+                }, 2000);
+            });
+            
+            // Play song automatically after a short delay
+            setTimeout(() => {
+                if(soundEnabled) {
+                    customSong.play();
+                    startNotesAnimation(musicNotes);
+                }
+            }, 1000);
+        };
+        
+        // Show the birthday message
+        const showBirthdayMessage = (name, age) => {
+            // Hide countdown, show birthday message
+            document.getElementById('countdownSection').style.display = 'none';
+            const birthdayMessage = document.getElementById('birthdayMessage');
+            birthdayMessage.style.display = 'block';
+            
+            // Create celebratory effects
+            createConfetti();
+            launchFireworks();
+            
+            // Stop all background sounds
+            stopAllSounds();
+            
+            // Build the message based on access level
+            let message = `
+                <div class="birthday-message">
+                    <div class="balloons">
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                        <div class="balloon">🎈</div>
+                    </div>
+                    
+                    <div class="surprise-reveal">SURPRISE!!!</div>
+                    
+                    <div class="cake">🎂</div>
+                    
+                    <h1>Happy Birthday, ${name}!</h1>
+            `;
+            
+            if (age) {
+                message += `<h2>Congratulations on turning ${age}! 🎉</h2>`;
+            }
+            
+            // Personalized message based on relationship
+            switch(accessLevel) {
+                case "friend":
+                    message += `
+                        <p>As your friend, I want you to know that you make every day more awesome!</p>
+                        <p>May your special day be filled with fun, laughter, and all your favorite things.</p>
+                        <p>You're the coolest friend anyone could wish for! Let's make this your best year yet!</p>
+                    `;
+                    break;
+                case "family":
+                    message += `
+                        <p>To my amazing family member who lights up our lives every single day.</p>
+                        <p>Our family wouldn't be the same without your smile, laughter, and love.</p>
+                        <p>We love you to the moon and back! Today is all about celebrating YOU!</p>
+                    `;
+                    break;
+                case "bestie":
+                    message += `
+                        <p>To my absolute BEST friend in the whole wide world!</p>
+                        <p>You're the most amazing, incredible, fantastic person I know.</p>
+                        <p>Thank you for being the kind of friend everyone dreams of having!</p>
+                        <p>Let's make today the most epic celebration ever!</p>
+                    `;
+                    break;
+                default:
+                    message += `
+                        <p>Wishing you the happiest of birthdays filled with joy and laughter!</p>
+                        <p>May all your wishes come true on this special day!</p>
+                    `;
+            }
+            
+            // Add personal message from Rahul Gairola
+            message += `
+                <div style="margin-top: 30px; padding: 20px; border: 2px dashed var(--accent-color); border-radius: 15px; background-color: rgba(0,0,0,0.3);">
+                    <h2 style="color: var(--primary-color); margin-bottom: 15px;">Special Birthday Wishes</h2>
+                    <p style="font-style: italic; font-size: 1.1rem;">On this special day, I wish you a year filled with happiness, success, and beautiful moments that become cherished memories. May your journey ahead be as bright and wonderful as you are!</p>
+                    <p style="text-align: right; margin-top: 10px; font-weight: bold; color: var(--secondary-color);">- Rahul Gairola</p>
+                </div>
+            `;
+            
+            // Add custom music player
+            message += `<div id="customPlayerContainer"></div>`;
+            
+            // Add final celebration elements
+            message += `
+                <div style="margin-top: 30px;">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🎁 🎉 🎊 🎈 🎂 🎈 🎊 🎉 🎁</div>
+                    <p style="font-weight: bold; font-size: 1.2rem;">Your day should be as amazing as YOU are!</p>
+                </div>
+                
+                <div class="button-group" style="margin-top: 30px;">
+                    <button onclick="restartSurprise()">SEND AGAIN 🔄</button>
+                </div>
+            `;
+            
+            birthdayMessage.innerHTML = message;
+            
+            // Add the custom music player to the container
+            const playerContainer = document.getElementById('customPlayerContainer');
+            playerContainer.appendChild(createCustomMusicPlayer(name));
+            
+            // Initialize the player functionality
+            initMusicPlayer();
+            
+            // Start continuous celebration effects
+            startCelebrationEffects();
+        };
+        
+        // Toggle birthday music
+        let musicPlaying = true;
+        const toggleBirthdayMusic = () => {
+            musicPlaying = !musicPlaying;
+            const customSong = document.getElementById('customBirthdaySong');
+            
+            if (musicPlaying) {
+                customSong.play();
+            } else {
+                customSong.pause();
+            }
+            
+            playSound('click', 0.5);
+        };
+        
+        // Start continuous celebration effects
+        let celebrationInterval;
+        const startCelebrationEffects = () => {
+            // Initial fireworks and confetti
+            launchFireworks();
+            
+            // Continue with periodic effects
+            celebrationInterval = setInterval(() => {
+                if (Math.random() > 0.5) {
+                    launchFireworks();
+                }
+                
+                if (Math.random() > 0.7) {
+                    createConfetti();
+                }
+            }, 5000);
+        };
+        
+        // Restart the surprise
+        const restartSurprise = () => {
+            playSound('click', 0.5);
+            stopAllSounds();
+            clearInterval(celebrationInterval);
+            stopNotesAnimation();
+            location.reload();
+        };
+        
+        // Add event listeners when document is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add click listener to initialize audio
+            document.body.addEventListener('click', initAudio, { once: true });
+            
+            // Preload sounds after a slight delay
+            setTimeout(() => {
+                for (const sound of Object.values(sounds)) {
+                    try {
+                        sound.load();
+                    } catch (e) {
+                        console.log("Error preloading sound:", e);
+                    }
+                }
+            }, 1000);
+        });
+    </script>
