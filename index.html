@@ -382,6 +382,129 @@
             box-shadow: 0 0 10px var(--secondary-color);
         }
         
+        /* Custom music player styling */
+        .custom-music-player {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            text-align: center;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--primary-color); }
+            100% { box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--secondary-color); }
+        }
+        
+        .music-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+        
+        .music-controls-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .music-controls-custom button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            min-width: unset;
+        }
+        
+        .music-progress {
+            height: 8px;
+            width: 100%;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .music-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        
+        .music-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .music-notes {
+            position: relative;
+            height: 30px;
+            margin: 10px 0;
+        }
+        
+        .music-note {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            top: 0;
+            animation: float-note 2s linear forwards;
+        }
+        
+        @keyframes float-note {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-30px); opacity: 0; }
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            cursor: pointer;
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            cursor: pointer;
+            border: none;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             h1 { font-size: 1.8rem; }
@@ -392,6 +515,7 @@
             .lock-icon { font-size: 4rem; }
             .terminal::before { font-size: 1rem; }
             .sound-button { width: 40px; height: 40px; font-size: 1.2rem; }
+            .music-title { font-size: 1.1rem; }
         }
         
         @media (max-width: 480px) {
@@ -406,6 +530,7 @@
             .unlock-btn { font-size: 1rem; padding: 12px 25px; }
             .terminal { padding: 15px; }
             .terminal::before { font-size: 0.9rem; padding: 8px; }
+            .music-title { font-size: 1rem; }
         }
     </style>
 </head>
@@ -429,7 +554,7 @@
                 <p>You've been selected for a top-secret birthday operation!</p>
                 
                 <label for="name">👤 Target Name:</label>
-                <input type="text" id="name" placeholder="Enter the birthday person's name">
+                <input type="text" id="name" placeholder="Enter the birthday person's name" value="Arushi">
                 
                 <label for="age">🎂 Achievement Level:</label>
                 <input type="number" id="age" placeholder="How many years awesome?">
@@ -460,6 +585,11 @@
     <!-- Sound control button -->
     <div class="sound-button" onclick="toggleSound()" id="soundToggle">🔊</div>
 
+    <!-- Audio elements -->
+    <audio id="customBirthdaySong" preload="auto" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=happy-birthday-tropical-house-version-1-16104.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         // ===== SOUND SYSTEM =====
         
@@ -476,7 +606,7 @@
             cheer: "https://assets.mixkit.co/active_storage/sfx/535/535-preview.mp3", // Crowd cheering
             trumpet: "https://assets.mixkit.co/active_storage/sfx/976/976-preview.mp3", // Trumpet fanfare
             birthday: "https://assets.mixkit.co/active_storage/sfx/531/531-preview.mp3", // Birthday music
-            birthdaySong: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_84e5bd1879.mp3?filename=happy-birthday-instrumental-hip-hop-128-bpm-9388.mp3", // Royalty-free happy birthday song
+            birthdaySong: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=happy-birthday-tropical-house-version-1-16104.mp3", // Royalty-free happy birthday song
             click: "https://assets.mixkit.co/active_storage/sfx/2675/2675-preview.mp3" // Button click
         };
         
@@ -648,6 +778,47 @@
             }
         };
         
+        // ===== CUSTOM SONG PLAYER =====
+        
+        // Create floating music notes animation
+        const createMusicNote = (container) => {
+            const notes = ['♪', '♫', '♩', '♬', '🎵', '🎶'];
+            const note = document.createElement('div');
+            note.className = 'music-note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = `${Math.random() * 100}%`;
+            note.style.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
+            container.appendChild(note);
+            
+            setTimeout(() => {
+                note.remove();
+            }, 2000);
+        };
+        
+        // Start music notes animation
+        let notesInterval;
+        const startNotesAnimation = (container) => {
+            // Clear any existing interval
+            if (notesInterval) clearInterval(notesInterval);
+            
+            // Create new interval
+            notesInterval = setInterval(() => {
+                createMusicNote(container);
+            }, 300);
+        };
+        
+        // Stop music notes animation
+        const stopNotesAnimation = () => {
+            clearInterval(notesInterval);
+        };
+        
+        // Format time for music player
+        const formatTime = (seconds) => {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        };
+        
         // ===== MAIN FUNCTIONALITY =====
         
         // Access level variable
@@ -749,6 +920,122 @@
             }
         };
         
+        // Create custom music player for Happy Birthday song
+        const createCustomMusicPlayer = (name) => {
+            const playerContainer = document.createElement('div');
+            playerContainer.className = 'custom-music-player';
+            
+            // Get the custom birthday song
+            const customSong = document.getElementById('customBirthdaySong');
+            
+            // Create player elements
+            const playerHTML = `
+                <div class="music-title">🎵 Happy Birthday ${name}! 🎵</div>
+                <div class="music-notes" id="musicNotes"></div>
+                <div class="music-progress" id="musicProgress">
+                    <div class="music-progress-bar" id="musicProgressBar"></div>
+                </div>
+                <div class="music-time">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+                <div class="music-controls-custom">
+                    <button id="playBtn">▶️</button>
+                    <button id="pauseBtn">⏸️</button>
+                    <button id="restartBtn">🔄</button>
+                </div>
+                <div class="volume-control">
+                    <span>🔈</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+                    <span>🔊</span>
+                </div>
+            `;
+            
+            playerContainer.innerHTML = playerHTML;
+            
+            // Return the player element to be added to the DOM
+            return playerContainer;
+        };
+        
+        // Initialize custom music player functionality
+        const initMusicPlayer = () => {
+            // Get elements
+            const customSong = document.getElementById('customBirthdaySong');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const musicProgress = document.getElementById('musicProgress');
+            const musicProgressBar = document.getElementById('musicProgressBar');
+            const currentTime = document.getElementById('currentTime');
+            const totalTime = document.getElementById('totalTime');
+            const musicNotes = document.getElementById('musicNotes');
+            
+            // Set initial volume
+            customSong.volume = volumeSlider.value / 100;
+            
+            // Add event listeners
+            playBtn.addEventListener('click', () => {
+                stopAllSounds(); // Stop any other sounds
+                customSong.play();
+                startNotesAnimation(musicNotes);
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                customSong.pause();
+                stopNotesAnimation();
+            });
+            
+            restartBtn.addEventListener('click', () => {
+                customSong.currentTime = 0;
+                customSong.play();
+            });
+            
+            volumeSlider.addEventListener('input', () => {
+                customSong.volume = volumeSlider.value / 100;
+            });
+            
+            // Update progress bar
+            customSong.addEventListener('timeupdate', () => {
+                const percent = (customSong.currentTime / customSong.duration) * 100;
+                musicProgressBar.style.width = `${percent}%`;
+                currentTime.textContent = formatTime(customSong.currentTime);
+                
+                // Generate music notes randomly while playing
+                if(!customSong.paused && Math.random() > 0.9) {
+                    createMusicNote(musicNotes);
+                }
+            });
+            
+            // Allow seeking
+            musicProgress.addEventListener('click', (e) => {
+                const percent = e.offsetX / musicProgress.offsetWidth;
+                customSong.currentTime = percent * customSong.duration;
+            });
+            
+            // Set total time once metadata is loaded
+            customSong.addEventListener('loadedmetadata', () => {
+                totalTime.textContent = formatTime(customSong.duration);
+            });
+            
+            // Handle song ending
+            customSong.addEventListener('ended', () => {
+                // If song ends, restart it after a short delay
+                setTimeout(() => {
+                    customSong.currentTime = 0;
+                    customSong.play();
+                }, 2000);
+            });
+            
+            // Play song automatically after a short delay
+            setTimeout(() => {
+                if(soundEnabled) {
+                    customSong.play();
+                    startNotesAnimation(musicNotes);
+                }
+            }, 1000);
+        };
+        
         // Show the birthday message
         const showBirthdayMessage = (name, age) => {
             // Hide countdown, show birthday message
@@ -760,11 +1047,8 @@
             createConfetti();
             launchFireworks();
             
-            // Play birthday song
+            // Stop all background sounds
             stopAllSounds();
-            setTimeout(() => {
-                playSound('birthdaySong', 0.7);
-            }, 1000);
             
             // Build the message based on access level
             let message = `
@@ -828,6 +1112,9 @@
                 </div>
             `;
             
+            // Add custom music player
+            message += `<div id="customPlayerContainer"></div>`;
+            
             // Add final celebration elements
             message += `
                 <div style="margin-top: 30px;">
@@ -837,11 +1124,17 @@
                 
                 <div class="button-group" style="margin-top: 30px;">
                     <button onclick="restartSurprise()">SEND AGAIN 🔄</button>
-                    <button onclick="toggleBirthdayMusic()">MUSIC 🎵</button>
                 </div>
             `;
             
             birthdayMessage.innerHTML = message;
+            
+            // Add the custom music player to the container
+            const playerContainer = document.getElementById('customPlayerContainer');
+            playerContainer.appendChild(createCustomMusicPlayer(name));
+            
+            // Initialize the player functionality
+            initMusicPlayer();
             
             // Start continuous celebration effects
             startCelebrationEffects();
@@ -851,11 +1144,12 @@
         let musicPlaying = true;
         const toggleBirthdayMusic = () => {
             musicPlaying = !musicPlaying;
+            const customSong = document.getElementById('customBirthdaySong');
             
             if (musicPlaying) {
-                playSound('birthdaySong', 0.7);
+                customSong.play();
             } else {
-                sounds['birthdaySong'].pause();
+                customSong.pause();
             }
             
             playSound('click', 0.5);
@@ -884,6 +1178,7 @@
             playSound('click', 0.5);
             stopAllSounds();
             clearInterval(celebrationInterval);
+            stopNotesAnimation();
             location.reload();
         };
         
