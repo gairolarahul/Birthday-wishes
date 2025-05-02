@@ -3,35 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret Hacker Birthday Protocol</title>
-    <audio id="keyboardSound" preload="auto">
-        <source src="https://cdn.freesound.org/previews/328/328117_5296620-lq.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="accessGrantedSound" preload="auto">
-        <source src="https://cdn.freesound.org/previews/399/399934_5549376-lq.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="fireworkSound" preload="auto">
-        <source src="https://cdn.freesound.org/previews/4/4404_9058-lq.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="buttonClickSound" preload="auto">
-        <source src="https://cdn.freesound.org/previews/571/571008_10978243-lq.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="birthdaySong" preload="auto" loop>
-        <source src="https://cdn.freesound.org/previews/360/360596_1914751-lq.mp3" type="audio/mpeg">
-    </audio>
+    <title>Secret Birthday Mission</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
+            background-color: #2E0854;
+            color: #FFD700;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
+            background-image: radial-gradient(#5A1999, #2E0854);
         }
         
         .container {
@@ -43,11 +29,11 @@
         }
 
         .terminal {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.7);
             padding: 20px;
-            border: 2px solid #0f0;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #0f0;
+            border: 3px solid #FF69B4;
+            border-radius: 20px;
+            box-shadow: 0 0 15px #FF69B4, 0 0 25px #00FFFF;
             margin-bottom: 20px;
             text-align: left;
             position: relative;
@@ -55,38 +41,39 @@
         }
 
         .terminal::before {
-            content: "SECURE TERMINAL v3.4.1";
+            content: "🎮 BIRTHDAY MISSION CONTROL 🎮";
             display: block;
-            background-color: #0f0;
+            background: linear-gradient(to right, #FF69B4, #00FFFF);
             color: #000;
-            padding: 5px 10px;
+            padding: 8px 10px;
             margin: -20px -20px 20px -20px;
             font-weight: bold;
+            border-radius: 17px 17px 0 0;
+            text-align: center;
         }
 
         h1 {
-            color: #0f0;
+            color: #FF69B4;
             font-size: 2.5em;
             margin: 0;
-            text-shadow: 0 0 5px #0f0;
-            animation: glow 1.5s ease-in-out infinite alternate;
+            text-shadow: 2px 2px 0 #00FFFF, -2px -2px 0 #00FFFF;
+            animation: colorChange 3s infinite;
         }
 
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 5px #0f0;
-            }
-            to {
-                text-shadow: 0 0 20px #0f0;
-            }
+        @keyframes colorChange {
+            0% { color: #FF69B4; }
+            33% { color: #FFD700; }
+            66% { color: #00FFFF; }
+            100% { color: #FF69B4; }
         }
 
         .typing {
             overflow: hidden;
             white-space: nowrap;
-            border-right: 0.15em solid #0f0;
+            border-right: 0.15em solid #FFD700;
             margin: 0 auto;
             animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+            font-size: 1.2em;
         }
 
         @keyframes typing {
@@ -96,65 +83,87 @@
 
         @keyframes blink-caret {
             from, to { border-color: transparent }
-            50% { border-color: #0f0 }
+            50% { border-color: #FFD700 }
         }
 
         button {
-            background-color: #000;
-            color: #0f0;
-            border: 2px solid #0f0;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 1em;
+            background: linear-gradient(to bottom, #FF69B4, #FF1493);
+            color: white;
+            border: 2px solid #00FFFF;
+            border-radius: 15px;
+            padding: 12px 24px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-size: 1.1em;
             cursor: pointer;
             margin: 10px;
             transition: all 0.3s;
+            text-shadow: 1px 1px 2px #000;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
         button:hover {
-            background-color: #0f0;
-            color: #000;
-            box-shadow: 0 0 10px #0f0;
+            background: linear-gradient(to bottom, #00FFFF, #00CED1);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.8);
         }
 
         input {
-            background-color: #000;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 10px;
-            font-family: 'Courier New', monospace;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #FFD700;
+            border: 2px solid #FF69B4;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
             width: 80%;
             margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        input::placeholder {
+            color: rgba(255, 215, 0, 0.6);
         }
 
         .command-output {
             margin: 10px 0;
             opacity: 0;
             transition: opacity 1s;
+            font-size: 1.1em;
         }
 
-        .binary {
+        .floating-objects {
             position: absolute;
-            color: #0f0;
-            opacity: 0.1;
-            font-size: 10px;
-            z-index: 1;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
+            top: 0;
+            left: 0;
             pointer-events: none;
+            z-index: 1;
+        }
+
+        .float-item {
+            position: absolute;
+            font-size: 30px;
+            animation: float 15s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+            }
         }
 
         .firework {
             position: absolute;
-            width: 5px;
-            height: 5px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.5);
-            animation: explosion 1s ease-out forwards;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.8);
+            animation: explosion 1.5s ease-out forwards;
             z-index: 1;
         }
 
@@ -164,28 +173,31 @@
                 opacity: 1;
             }
             100% {
-                transform: scale(20);
+                transform: scale(25);
                 opacity: 0;
             }
         }
 
         .cake {
-            font-size: 2em;
+            font-size: 4em;
             margin: 20px 0;
             animation: bounce 2s infinite;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
         }
 
         @keyframes bounce {
             0%, 100% {
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
             50% {
-                transform: translateY(-10px);
+                transform: translateY(-15px) scale(1.1);
             }
         }
 
         .glitch {
             animation: glitch 1s linear infinite;
+            color: #FF69B4;
+            text-shadow: 2px 2px 0 #00FFFF, -2px -2px 0 #FFD700;
         }
 
         @keyframes glitch {
@@ -199,137 +211,235 @@
                 transform: translate(0,0) skew(5deg); 
             }
         }
+        
+        .balloons {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .balloon {
+            font-size: 3em;
+            margin: 0 10px;
+            animation: balloonFloat 3s ease-in-out infinite;
+        }
+        
+        .balloon:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        
+        .balloon:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        
+        .balloon:nth-child(4) {
+            animation-delay: 0.9s;
+        }
+        
+        .balloon:nth-child(5) {
+            animation-delay: 1.2s;
+        }
+        
+        @keyframes balloonFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+        
+        .gift {
+            font-size: 2.5em;
+            display: inline-block;
+            margin: 0 10px;
+            animation: giftspin 3s ease-in-out infinite;
+        }
+        
+        @keyframes giftspin {
+            0% {
+                transform: rotate(-10deg);
+            }
+            50% {
+                transform: rotate(10deg);
+            }
+            100% {
+                transform: rotate(-10deg);
+            }
+        }
+        
+        .sound-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
-    <div class="binary" id="binary"></div>
+    <div class="floating-objects" id="floatingObjects"></div>
     <div class="container">
         <div class="terminal">
-            <p id="initOutput" class="typing">Initializing Birthday Protocol...</p>
+            <p id="initOutput" class="typing">👋 Starting Special Birthday Mission... 👋</p>
             <div id="hackOutput" class="command-output"></div>
             <div id="birthdayForm">
-                <p>Enter Target's Name:</p>
-                <input type="text" id="name" placeholder="Enter name">
-                <p>Enter Target's Age:</p>
-                <input type="number" id="age" placeholder="Enter age">
-                <p>Select Access Level:</p>
+                <p>🌟 Enter Birthday Star's Name:</p>
+                <input type="text" id="name" placeholder="Type their name here">
+                <p>🎂 How many years awesome:</p>
+                <input type="number" id="age" placeholder="Enter their age">
+                <p>🤝 Your special connection:</p>
                 <button onclick="selectAccess('friend')">Friend</button>
                 <button onclick="selectAccess('family')">Family</button>
                 <button onclick="selectAccess('bestie')">Best Friend</button>
-                <p>Sound Control:</p>
-                <button id="soundToggle" onclick="toggleSound()">🔊 SOUND ON</button>
-                <p>Initiate Birthday Hack:</p>
-                <button onclick="executeHack()">EXECUTE</button>
+                <p>🎮 Start the Birthday Adventure:</p>
+                <button onclick="executeHack()" style="font-size: 1.2em;">LAUNCH MISSION 🚀</button>
             </div>
         </div>
     </div>
+    
+    <div class="sound-button" onclick="toggleSound()" id="soundToggle">🔊</div>
 
     <script>
+        // Create audio elements programmatically
+        const soundEffects = {
+            keyboard: "https://www.myinstants.com/media/sounds/keyboard-typing.mp3",
+            success: "https://www.myinstants.com/media/sounds/game-level-complete.mp3",
+            firework: "https://www.myinstants.com/media/sounds/firework-sound.mp3",
+            button: "https://www.myinstants.com/media/sounds/click.mp3",
+            birthday: "https://www.myinstants.com/media/sounds/happy-birthday-music-box.mp3"
+        };
+        
+        // Create audio elements
+        const sounds = {};
+        for (const [key, url] of Object.entries(soundEffects)) {
+            const audio = new Audio(url);
+            if (key === 'birthday') {
+                audio.loop = true;
+            }
+            sounds[key] = audio;
+            document.body.appendChild(audio);
+        }
+        
         // Audio controls
         let soundEnabled = true;
         
         // Function to play sound with control
-        const playSound = (soundId) => {
-            if (soundEnabled) {
-                const sound = document.getElementById(soundId);
-                if (sound) {
-                    // Reset the sound to the beginning if it's already playing
-                    sound.currentTime = 0;
-                    sound.play().catch(e => {
-                        console.log("Sound play error:", e);
-                        // Auto-play may be blocked by browser policy
-                    });
-                }
+        const playSound = (soundKey) => {
+            if (soundEnabled && sounds[soundKey]) {
+                // Reset the sound to the beginning if it's already playing
+                sounds[soundKey].currentTime = 0;
+                sounds[soundKey].play().catch(e => {
+                    console.log("Sound play error:", e);
+                    // Auto-play may be blocked by browser policy
+                });
             }
         };
         
         // Stop all sounds
         const stopAllSounds = () => {
-            const sounds = document.querySelectorAll('audio');
-            sounds.forEach(sound => {
+            for (const sound of Object.values(sounds)) {
                 sound.pause();
                 sound.currentTime = 0;
-            });
+            }
         };
         
         // Toggle sound on/off
         const toggleSound = () => {
             soundEnabled = !soundEnabled;
+            const soundToggle = document.getElementById('soundToggle');
             if (!soundEnabled) {
                 stopAllSounds();
-                document.getElementById('soundToggle').textContent = "🔇 SOUND OFF";
+                soundToggle.textContent = "🔇";
             } else {
-                document.getElementById('soundToggle').textContent = "🔊 SOUND ON";
+                soundToggle.textContent = "🔊";
             }
         };
         
-        // Generate binary background
-        const generateBinary = () => {
-            let binary = "";
-            for (let i = 0; i < 5000; i++) {
-                binary += Math.floor(Math.random() * 2);
-                if (i % 50 === 0) binary += "<br>";
+        // Create floating objects
+        const createFloatingObjects = () => {
+            const container = document.getElementById('floatingObjects');
+            const emojis = ['🎮', '🚀', '💻', '🔑', '🎯', '🎨', '🎪', '🎭', '🎡', '🧸', '🦄', '🌈'];
+            
+            for (let i = 0; i < 20; i++) {
+                const item = document.createElement('div');
+                item.className = 'float-item';
+                item.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                item.style.left = `${Math.random() * 100}vw`;
+                item.style.animationDuration = `${15 + Math.random() * 15}s`;
+                item.style.animationDelay = `${Math.random() * 10}s`;
+                container.appendChild(item);
             }
-            document.getElementById("binary").innerHTML = binary;
         };
-        generateBinary();
+        createFloatingObjects();
 
         // Access level variable
         let accessLevel = "";
         
         // Select access level
         const selectAccess = (level) => {
-            playSound("buttonClickSound");
+            playSound("button");
             accessLevel = level;
             const buttons = document.querySelectorAll('button');
             buttons.forEach(btn => {
-                if (btn.textContent.toLowerCase() === level.toLowerCase() || 
-                    btn.textContent.toLowerCase() === 'best friend' && level === 'bestie') {
-                    btn.style.backgroundColor = "#0f0";
-                    btn.style.color = "#000";
-                } else if (btn.textContent.toLowerCase() !== "execute" && 
-                          !btn.textContent.includes("SOUND")) {
-                    btn.style.backgroundColor = "#000";
-                    btn.style.color = "#0f0";
+                if (btn.textContent.toLowerCase().includes(level.toLowerCase()) || 
+                    btn.textContent.toLowerCase().includes('best friend') && level === 'bestie') {
+                    btn.style.background = 'linear-gradient(to bottom, #00FFFF, #00CED1)';
+                } else if (!btn.textContent.toLowerCase().includes('launch')) {
+                    btn.style.background = 'linear-gradient(to bottom, #FF69B4, #FF1493)';
                 }
             });
         };
 
         // Create a firework effect
         const createFirework = () => {
-            if (Math.random() > 0.7) {
-                playSound("fireworkSound");
+            if (Math.random() > 0.8) {
+                playSound("firework");
             }
             
             const firework = document.createElement("div");
             firework.className = "firework";
             firework.style.left = Math.random() * 100 + "vw";
             firework.style.top = Math.random() * 100 + "vh";
-            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            
+            // Random colors for fireworks
+            const colors = ['#FF69B4', '#00FFFF', '#FFD700', '#FF4500', '#7CFC00', '#9400D3'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            firework.style.backgroundColor = randomColor;
+            firework.style.boxShadow = `0 0 5px 2px ${randomColor}`;
+            
             document.body.appendChild(firework);
 
             // Remove firework after animation
             setTimeout(() => {
                 firework.remove();
-            }, 1000);
+            }, 1500);
         };
 
         // Launch multiple fireworks
         const launchFireworks = () => {
             for (let i = 0; i < 15; i++) {
-                setTimeout(createFirework, i * 200);
+                setTimeout(createFirework, i * 300);
             }
         };
 
         // Execute the birthday hack
         const executeHack = () => {
-            playSound("buttonClickSound");
+            playSound("button");
             
             const name = document.getElementById("name").value;
             const age = document.getElementById("age").value;
             
             if (!name) {
-                alert("ERROR: Target name required for hack execution!");
+                alert("We need the birthday star's name to start the mission!");
                 return;
             }
             
@@ -341,40 +451,40 @@
             hackOutput.style.opacity = "1";
             
             const commands = [
-                "$ initiating birthday protocol...",
-                "$ accessing secure mainframe...",
-                "$ bypassing security...",
-                "$ decrypting target data...",
-                "$ target identified: " + name,
-                "$ accessing celebration database...",
-                "$ compiling birthday algorithm...",
-                "$ preparing digital confetti...",
-                "$ activating birthday mode in 3...",
-                "$ 2...",
-                "$ 1...",
-                "$ HACK SUCCESSFUL!"
+                "🔍 Scanning for birthday data...",
+                "🔐 Unlocking special surprise vault...",
+                "🎁 Collecting digital presents...",
+                "🎂 Baking virtual cake...",
+                "🎯 Target birthday star identified: " + name,
+                "🎨 Preparing colorful decorations...",
+                "🎮 Loading celebration mini-games...",
+                "🎪 Setting up virtual party space...",
+                "🚀 Launching celebration in 3...",
+                "🚀 2...",
+                "🚀 1...",
+                "🎉 BIRTHDAY MISSION SUCCESSFUL! 🎉"
             ];
             
             // Animate typing commands
             let i = 0;
             const interval = setInterval(() => {
                 if (i < commands.length) {
-                    playSound("keyboardSound");
+                    playSound("keyboard");
                     hackOutput.innerHTML += commands[i] + "<br>";
                     hackOutput.scrollTop = hackOutput.scrollHeight;
                     i++;
                     
-                    // Play access granted sound on last command
+                    // Play success sound on last command
                     if (i === commands.length) {
                         setTimeout(() => {
-                            playSound("accessGrantedSound");
+                            playSound("success");
                         }, 300);
                     }
                 } else {
                     clearInterval(interval);
                     showBirthdayMessage(name, age);
                 }
-            }, 500);
+            }, 800);
         };
         
         // Show the birthday message
@@ -382,7 +492,7 @@
             // Play the birthday song
             stopAllSounds();
             setTimeout(() => {
-                playSound("birthdaySong");
+                playSound("birthday");
             }, 500);
             
             // Clear terminal content
@@ -392,39 +502,54 @@
             const birthdayMessage = document.createElement("div");
             birthdayMessage.style.textAlign = "center";
             
+            // Add balloons
+            let message = `<div class="balloons">
+                            <div class="balloon">🎈</div>
+                            <div class="balloon">🎈</div>
+                            <div class="balloon">🎈</div>
+                            <div class="balloon">🎈</div>
+                            <div class="balloon">🎈</div>
+                           </div>`;
+            
             // Add message based on access level
-            let message = `<h1 class="glitch">ACCESS GRANTED</h1>`;
+            message += `<h1 class="glitch">MISSION ACCOMPLISHED!</h1>`;
             message += `<div class="cake">🎂</div>`;
             message += `<h1>Happy Birthday, ${name}!</h1>`;
             
             if (age) {
-                message += `<p>Congratulations on leveling up to age ${age}!</p>`;
+                message += `<p style="font-size: 1.2em;">Woohoo! You're ${age} years awesome today!</p>`;
+                
+                // Add gifts with number based on age (max 5)
+                message += `<div>`;
+                for (let i = 0; i < Math.min(age, 5); i++) {
+                    message += `<span class="gift">🎁</span>`;
+                }
+                message += `</div>`;
             }
             
             switch(accessLevel) {
                 case "friend":
-                    message += `<p>You're officially one year closer to becoming a master hacker!</p>
-                                <p>May your code always compile and your bugs be easily fixed.</p>
-                                <p>Sending digital high-fives and virtual cake!</p>`;
+                    message += `<p style="font-size: 1.2em;">You've reached Level ${age} in the Game of Life! 🎮</p>
+                                <p>Your special friend powers make you the coolest kid around!</p>
+                                <p>May all your wishes come true faster than any computer can calculate!</p>`;
                     break;
                 case "family":
-                    message += `<p>The family encryption key gets stronger with you in it!</p>
-                                <p>You're the best firewall a family could have against boring days.</p>
-                                <p>Uploading tons of love and hugs to your life database!</p>`;
+                    message += `<p style="font-size: 1.2em;">Our family's superhero is ${age} today! 👪</p>
+                                <p>You make our family team the happiest place in the world!</p>
+                                <p>Sending you a million billion hugs and kisses today!</p>`;
                     break;
                 case "bestie":
-                    message += `<p>Best friends are like the perfect encryption algorithm - impossible to break!</p>
-                                <p>You're my favorite person to share the secret codes of life with.</p>
-                                <p>Your friendship has been downloaded to my heart forever!</p>`;
+                    message += `<p style="font-size: 1.2em;">Best friends forever means celebrating ALL your ${age} years! 💖</p>
+                                <p>You're my player 2 in this awesome game of life!</p>
+                                <p>Let's keep having epic adventures together forever!</p>`;
                     break;
                 default:
-                    message += `<p>May your day be filled with as much fun as a computer with unlimited RAM!</p>
-                                <p>Wishing you a day of happiness overload!</p>`;
+                    message += `<p style="font-size: 1.2em;">May your day be filled with fun and games!</p>
+                                <p>Wishing you the biggest slice of happiness cake ever!</p>`;
             }
             
-            message += `<p>PROTOCOL COMPLETE: Have an amazing birthday!</p>`;
-            message += `<button onclick="restartHack()">RESTART HACK</button>`;
-            message += `<button id="soundToggle" onclick="toggleSound()">🔊 SOUND ON</button>`;
+            message += `<p style="font-size: 1.3em; margin-top: 20px;">🎮 MISSION COMPLETE: Have the most AMAZING birthday ever! 🎮</p>`;
+            message += `<button onclick="restartHack()" style="font-size: 1.2em;">NEW MISSION 🚀</button>`;
             
             birthdayMessage.innerHTML = message;
             document.querySelector(".terminal").appendChild(birthdayMessage);
@@ -438,10 +563,27 @@
         
         // Restart the hack
         const restartHack = () => {
-            playSound("buttonClickSound");
+            playSound("button");
             stopAllSounds();
             location.reload();
         };
+        
+        // Attempt to preload sounds to fix issues
+        window.addEventListener('load', function() {
+            // Try to interact with sounds after a user gesture
+            document.body.addEventListener('click', function() {
+                // Try to play and immediately pause all sounds to "wake them up"
+                for (const sound of Object.values(sounds)) {
+                    sound.play().then(() => {
+                        sound.pause();
+                        sound.currentTime = 0;
+                    }).catch(e => {
+                        // Autoplay might still be blocked, but that's okay
+                        console.log("Initial sound interaction error:", e);
+                    });
+                }
+            }, { once: true });
+        });
     </script>
 </body>
 </html>
