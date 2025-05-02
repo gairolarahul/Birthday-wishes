@@ -957,10 +957,8 @@
                     <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
                     <span>🔊</span>
                 </div>
-                <div style="margin-top: 20px; text-align: center;">
-                    <button id="specialSongBtn" style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 12px 25px; font-size: 1.1rem; min-width: 200px; animation: pulse 2s infinite;" onclick="showYouTubePlayer()">
-                        🎵 Play Special Birthday Song 🎵
-                    </button>
+                <div id="finalMessageText" style="margin-top: 15px; text-align: center; font-size: 1.1rem; opacity: 0.7;">
+                    Special birthday surprise loading in a few seconds...
                 </div>
             `;
             
@@ -1210,6 +1208,12 @@
             
             // Start continuous celebration effects
             startCelebrationEffects();
+            
+            // Play the background music for a while, then show the YouTube video
+            setTimeout(() => {
+                // Play the YouTube video automatically after delay
+                showYouTubePlayer();
+            }, 15000); // 15 seconds delay
         };
         
         // Toggle birthday music
