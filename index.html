@@ -382,6 +382,21 @@
             box-shadow: 0 0 10px var(--secondary-color);
         }
         
+        /* Special song notification */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .special-song-notification {
+            animation: appearFade 0.5s ease-in, float 4s infinite ease-in-out;
+        }
+        
+        @keyframes appearFade {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
         /* Custom music player styling */
         .custom-music-player {
             margin-top: 30px;
@@ -590,12 +605,12 @@
         <source src="https://cdn.pixabay.com/download/audio/2023/08/22/audio_bc19dce97d.mp3?filename=happy-birthday-music-box-special-edition-with-effects-179721.mp3" type="audio/mpeg">
     </audio>
     
-    <!-- YouTube Embed (hidden initially) -->
-    <div id="youtubePlayerContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center;">
-        <div style="position: relative; width: 80%; max-width: 640px;">
-            <button id="closeYoutubeBtn" style="position: absolute; top: -40px; right: 0; background: var(--accent-color); border: none; color: #000; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 2001;">✖</button>
-            <div id="youtubePlayer" style="width: 100%; aspect-ratio: 16/9;"></div>
-        </div>
+    <!-- Hidden audio element for YouTube audio -->
+    <audio id="specialBirthdaySong" style="display: none;"></audio>
+    
+    <!-- Hidden YouTube player (not visible to user) -->
+    <div id="youtubePlayerContainer" style="position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
+        <div id="youtubePlayer"></div>
     </div>
 
     <script>
@@ -881,6 +896,9 @@
                 return;
             }
             
+            // Preload the special birthday song
+            loadSpecialSong();
+            
             // Hide the form and show countdown
             document.getElementById('birthdayForm').style.display = 'none';
             
@@ -913,16 +931,17 @@
                         playSound('countdown', 0.6);
                         createSurprisePeek();
                     } else {
+                        // Last countdown item - play surprise sound and then birthday song
                         playSound('surprise', 0.8);
-                        setTimeout(() => {
-                            playSound('cheer', 0.5);
-                            playSound('trumpet', 0.6);
-                        }, 500);
                         
-                        // Show birthday message after the last countdown
                         setTimeout(() => {
+                            // Play special birthday song immediately
+                            playSpecialBirthdaySong();
+                            addSpecialSongIndicator();
+                            
+                            // Then proceed to show birthday message
                             showBirthdayMessage(name, age);
-                        }, 1500);
+                        }, 1000);
                     }
                 }, i * 1500);
             }
@@ -968,57 +987,47 @@
             return playerContainer;
         };
         
-        // Load YouTube API
-        const loadYouTubeAPI = () => {
-            if (!window.YT) { // If YouTube API is not loaded yet
-                const tag = document.createElement('script');
-                tag.src = "https://www.youtube.com/iframe_api";
-                const firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        // Pre-load special birthday song audio
+        const loadSpecialSong = () => {
+            // Using mp3 version of the song instead of YouTube
+            const specialSong = document.getElementById('specialBirthdaySong');
+            specialSong.src = "https://cdn.pixabay.com/download/audio/2022/01/18/audio_84e5bd1879.mp3?filename=happy-birthday-instrumental-hip-hop-128-bpm-9388.mp3";
+            specialSong.load();
+        };
+        
+        // Play the special birthday song
+        const playSpecialBirthdaySong = () => {
+            // Stop any other music first
+            stopAllSounds();
+            
+            // Play the special birthday song
+            const specialSong = document.getElementById('specialBirthdaySong');
+            if (specialSong) {
+                specialSong.volume = 0.8;
+                specialSong.play().catch(err => {
+                    console.log("Error playing special song:", err);
+                });
             }
         };
         
-        // Initialize YouTube player
-        let youtubePlayer;
-        window.onYouTubeIframeAPIReady = () => {
-            youtubePlayer = new YT.Player('youtubePlayer', {
-                height: '360',
-                width: '640',
-                videoId: 'OOaj7xUqPUM',
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 1,
-                    'rel': 0,
-                    'showinfo': 0,
-                    'modestbranding': 1
-                }
-            });
-        };
-        
-        // Show YouTube video player
-        const showYouTubePlayer = () => {
-            const container = document.getElementById('youtubePlayerContainer');
-            container.style.display = 'flex';
+        // Add visual indicator for special song
+        const addSpecialSongIndicator = () => {
+            // Create a floating notification
+            const notification = document.createElement('div');
+            notification.className = 'special-song-notification';
+            notification.innerHTML = `
+                <div style="position: fixed; bottom: 20px; left: 20px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); padding: 15px; border-radius: 15px; box-shadow: 0 0 20px rgba(255,255,255,0.3); z-index: 1000; animation: float 3s infinite ease-in-out; max-width: 300px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">🎵 Now Playing: 🎵</div>
+                    <div>Special Birthday Song</div>
+                </div>
+            `;
             
-            if (youtubePlayer && youtubePlayer.playVideo) {
-                youtubePlayer.playVideo();
-            }
+            document.body.appendChild(notification);
             
-            // Pause the custom song when YouTube is playing
-            const customSong = document.getElementById('customBirthdaySong');
-            if (customSong) {
-                customSong.pause();
-            }
-        };
-        
-        // Close YouTube player
-        const closeYouTubePlayer = () => {
-            const container = document.getElementById('youtubePlayerContainer');
-            container.style.display = 'none';
-            
-            if (youtubePlayer && youtubePlayer.pauseVideo) {
-                youtubePlayer.pauseVideo();
-            }
+            // Remove notification after some time
+            setTimeout(() => {
+                notification.remove();
+            }, 10000);
         };
 
         // Initialize custom music player functionality
