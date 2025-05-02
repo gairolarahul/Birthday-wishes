@@ -720,7 +720,7 @@
         <div class="gift-card-form" style="width: 90%; max-width: 500px; position: relative;">
             <button id="closeGiftFormBtn" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: var(--accent-color); width: 30px; height: 30px; font-size: 1.5rem; cursor: pointer;">✖</button>
             <h3>🎁 Birthday Surprise Gift! 🎁</h3>
-            <p>Enter the last 4 digits of Rahul's phone number to unlock your gift:</p>
+            <p>Enter the 4 digits password as 1234 to unlock your gift:</p>
             <input type="password" id="giftPasswordInput" placeholder="Enter 4-digit password" maxlength="4" inputmode="numeric" pattern="[0-9]*" required>
             <button onclick="submitGiftForm()">Unlock My Gift! 🎉</button>
             
@@ -769,7 +769,7 @@
             const password = passwordInput.value.trim();
             
             // Check if password matches
-            if (password === '0813') {
+            if (password === '1234') {
                 // Show the gift link
                 document.getElementById('giftThanks').style.display = 'block';
                 passwordInput.style.display = 'none';
@@ -1341,7 +1341,7 @@
                     <div class="surprise-reveal">SURPRISE!!!</div>
                     
                     <p style="background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 2px dashed var(--accent-color); margin: 20px 0;">
-                        <span style="font-style: italic; font-weight: bold;">Hint:</span> To unlock your gift card, click the gift button just below the music player and enter the last 4 digits of Rahul's phone number.You’ll find that further down the page.
+                        <span style="font-style: italic; font-weight: bold;">Hint:</span> To unlock your gift card, click the gift button just below the music player and enter the 4 digits password as 1234.You’ll find that further down the page.
                     </p>
                     
                     <div class="cake">🎂</div>
