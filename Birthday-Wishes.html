@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Wishes Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #e91e63;
+        }
+        input, select {
+            padding: 10px;
+            margin: 10px 0;
+            width: 80%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #c2185b;
+        }
+        #wishOutput {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff8e1;
+            font-size: 18px;
+            display: none;
+        }
+        .balloons {
+            display: none;
+            margin: 20px 0;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f0f;
+            position: absolute;
+            top: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎂 Birthday Wishes Generator 🎂</h1>
+        
+        <div>
+            <label for="name">Birthday Person's Name:</label>
+            <input type="text" id="name" placeholder="Enter name">
+        </div>
+        
+        <div>
+            <label for="age">Birthday Age (optional):</label>
+            <input type="number" id="age" placeholder="Enter age">
+        </div>
+        
+        <div>
+            <label for="relationship">Your Relationship:</label>
+            <select id="relationship">
+                <option value="friend">Friend</option>
+                <option value="family">Family Member</option>
+                <option value="partner">Partner</option>
+                <option value="colleague">Colleague</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div>
+            <label for="style">Message Style:</label>
+            <select id="style">
+                <option value="funny">Funny</option>
+                <option value="heartfelt">Heartfelt</option>
+                <option value="motivational">Motivational</option>
+                <option value="simple">Simple & Sweet</option>
+            </select>
+        </div>
+        
+        <button onclick="generateWish()">Generate Birthday Wish!</button>
+        
+        <div id="wishOutput"></div>
+        
+        <div class="balloons" id="balloons">
+            🎈🎈🎈🎈🎈🎈🎈
+        </div>
+    </div>
+
+    <script>
+        function generateWish() {
+            const name = document.getElementById('name').value.trim();
+            const age = document.getElementById('age').value.trim();
+            const relationship = document.getElementById('relationship').value;
+            const style = document.getElementById('style').value;
+            
+            if (!name) {
+                alert("Please enter the birthday person's name!");
+                return;
+            }
+            
+            let wishes = {
+                funny: [
+                    `Happy Birthday, ${name}! They say age is just a number, but in your case, it's a really big number! Just kidding! Have an amazing day!`,
+                    `${name}, remember that calories don't count on your birthday! Eat cake like nobody's watching!`,
+                    `Congrats on leveling up, ${name}! Your character has gained +1 wisdom and -1 metabolism!`
+                ],
+                heartfelt: [
+                    `Dear ${name}, on your special day, I want you to know how much joy and light you bring to my life. Happy Birthday!`,
+                    `${name}, may your birthday be as beautiful and wonderful as the friendship/love we share. Wishing you all the happiness in the world.`,
+                    `Happy Birthday to someone who makes the world a better place just by being in it. You're truly special, ${name}.`
+                ],
+                motivational: [
+                    `${name}, as you celebrate another year, remember that you have the power to achieve anything you set your mind to. Happy Birthday!`,
+                    `This new year of your life is full of possibilities, ${name}. Embrace them all! Happy Birthday!`,
+                    `${name}, may this birthday mark the beginning of an amazing journey filled with success and fulfillment!`
+                ],
+                simple: [
+                    `Happy Birthday, ${name}! Hope your day is as awesome as you are!`,
+                    `Wishing you a day filled with laughter and love, ${name}. Happy Birthday!`,
+                    `${name}, have the happiest of birthdays! You deserve it!`
+                ]
+            };
+            
+            // Add age-specific content if provided
+            if (age) {
+                wishes.funny.push(`${name}, ${age} years old? That's ${age * 12} months of being awesome!`);
+                wishes.heartfelt.push(`${name}, ${age} years of bringing joy and love into the world. What a beautiful milestone!`);
+                wishes.motivational.push(`${age} years of growth and learning. The best is yet to come, ${name}!`);
+                wishes.simple.push(`Happy ${age}th Birthday, ${name}! Have a wonderful day!`);
+            }
+            
+            // Add relationship-specific content
+            const relationshipTerms = {
+                friend: "friend",
+                family: "family member",
+                partner: "partner",
+                colleague: "colleague",
+                other: "amazing person"
+            };
+            
+            wishes.heartfelt.push(`To the best ${relationshipTerms[relationship]} anyone could ask for - Happy Birthday, ${name}!`);
+            
+            // Select a random wish from the appropriate category
+            const selectedWishes = wishes[style];
+            const randomWish = selectedWishes[Math.floor(Math.random() * selectedWishes.length)];
+            
+            // Display the wish with some animation
+            const wishOutput = document.getElementById('wishOutput');
+            wishOutput.textContent = randomWish;
+            wishOutput.style.display = "block";
+            
+            // Show balloons
+            document.getElementById('balloons').style.display = "block";
+            
+            // Add confetti effect
+            createConfetti();
+        }
+        
+        function createConfetti() {
+            const confettiCount = 100;
+            const container = document.querySelector('body');
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Random position, color and size
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.width = (Math.random() * 10) + 5 + 'px';
+                confetti.style.height = (Math.random() * 10) + 5 + 'px';
+                
+                // Animation
+                confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                container.appendChild(confetti);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+            
+            // Add keyframes for the fall animation
+            if (!document.getElementById('confettiStyle')) {
+                const style = document.createElement('style');
+                style.id = 'confettiStyle';
+                style.innerHTML = `
+                    @keyframes fall {
+                        0% {
+                            transform: translateY(-10px) rotate(0deg);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: translateY(100vh) rotate(360deg);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+    </script>
+</body>
+</html>
