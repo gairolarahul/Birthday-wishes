@@ -3,1448 +3,1365 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOP SECRET MESSAGE</title>
+    <title>postMessage Security Testing Course - Bug Bounty Edition</title>
     <style>
-        :root {
-            --primary-color: #FF3E9D;
-            --secondary-color: #0CF2FF;
-            --accent-color: #FFD639;
-            --dark-color: #2A1B3D;
-            --light-color: #FFFFFF;
-        }
-        
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--dark-color);
-            color: var(--light-color);
-            font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+            color: #333;
         }
         
-        /* Initial screen - locked appearance */
-        #lockScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            color: var(--secondary-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            text-align: center;
-            transition: transform 0.5s ease-in-out;
-        }
-        
-        .lock-icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .unlock-btn {
-            margin-top: 30px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            color: #fff;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .unlock-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        
-        /* Main content container */
         .container {
-            width: 95%;
-            max-width: 800px;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            position: relative;
-            z-index: 5;
-            display: none; /* Hidden initially */
-        }
-
-        /* Mission terminal */
-        .terminal {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 3px solid var(--primary-color);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 30px var(--primary-color),
-                        0 0 50px var(--secondary-color);
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        .terminal::before {
-            content: "✨ SECRET BIRTHDAY MISSION ✨";
-            display: block;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: #000;
-            font-weight: bold;
-            padding: 10px;
-            margin: -20px -20px 20px -20px;
-            text-align: center;
-            border-radius: 17px 17px 0 0;
-            font-size: 1.2rem;
-        }
-
-        h1, h2 {
-            text-align: center;
-            margin: 15px 0;
-            color: var(--accent-color);
-            text-shadow: 0 0 10px var(--accent-color);
         }
         
-        h1 {
-            font-size: 2rem;
-        }
-        
-        h2 {
-            font-size: 1.5rem;
-        }
-        
-        p {
-            margin: 15px 0;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        /* Form elements styling */
-        input {
-            background-color: rgba(0, 0, 0, 0.5);
-            color: var(--light-color);
-            border: 2px solid var(--secondary-color);
+        .header {
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 12px 15px;
-            font-size: 1rem;
-            width: 100%;
-            margin: 10px 0;
-            outline: none;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        
-        input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 15px var(--primary-color);
-        }
-        
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        button {
-            background: linear-gradient(135deg, var(--primary-color), #FF71B8);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 12px 25px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            margin: 5px;
-            min-width: 120px;
-        }
-        
-        button:hover, button:focus {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        
-        button.selected {
-            background: linear-gradient(135deg, var(--secondary-color), #66E7F7);
-            color: #000;
-        }
-        
-        button.primary {
-            background: linear-gradient(135deg, #FFD639, #FFA726);
-            font-size: 1.2rem;
-            padding: 15px 30px;
-        }
-
-        /* Output area */
-        .command-output {
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 20px 0;
-            opacity: 0;
-            transition: opacity 1s;
-            height: auto;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 1s ease-in-out;
-        }
-        
-        .command-output.active {
-            opacity: 1;
-            height: auto;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        
-        .command-line {
-            margin: 12px 0;
-            padding-left: 30px;
-            position: relative;
-            animation: fadeIn 0.5s forwards;
-            display: flex;
-            align-items: center;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .command-line::before {
-            content: ">";
-            position: absolute;
-            left: 10px;
-            color: var(--accent-color);
-        }
-        
-        .countdown-number {
-            font-size: 1.3rem;
-            margin-right: 12px;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        
-        .countdown-text {
-            display: inline-block;
-            vertical-align: middle;
-            font-size: 1.1rem;
-        }
-
-        /* Birthday message styling */
-        .birthday-message {
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
-            animation: fadeInScale 1s forwards;
         }
         
-        @keyframes fadeInScale {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        .cake {
-            font-size: 5rem;
-            margin: 20px 0;
-            display: inline-block;
-            animation: bounce 2s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        
-        .balloons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 15px 0;
-        }
-        
-        .balloon {
-            font-size: 3rem;
-            margin: 0 10px;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .balloon:nth-child(1) { animation-delay: 0s; }
-        .balloon:nth-child(2) { animation-delay: 0.3s; }
-        .balloon:nth-child(3) { animation-delay: 0.6s; }
-        .balloon:nth-child(4) { animation-delay: 0.9s; }
-        .balloon:nth-child(5) { animation-delay: 1.2s; }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        
-        .surprise-reveal {
-            font-size: 2.5rem;
-            animation: colorRotate 4s linear infinite;
-            text-shadow: 0 0 10px currentColor;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        
-        @keyframes colorRotate {
-            0% { color: var(--primary-color); }
-            33% { color: var(--secondary-color); }
-            66% { color: var(--accent-color); }
-            100% { color: var(--primary-color); }
-        }
-        
-        /* Background effects */
-        .firework {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            animation: explosion 1.5s ease-out forwards;
-            z-index: 1;
-            pointer-events: none;
-        }
-        
-        @keyframes explosion {
-            0% { transform: scale(0.1); opacity: 0; }
-            10% { opacity: 1; }
-            100% { transform: scale(25); opacity: 0; }
-        }
-        
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 15px;
-            top: -20px;
-            animation: fall 5s linear forwards;
-            z-index: 1;
-            pointer-events: none;
-        }
-        
-        @keyframes fall {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(100vh) rotate(360deg); }
-        }
-        
-        .background-elements {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        /* Surprise peeking elements during countdown */
-        .surprise-peek {
-            position: fixed;
-            font-size: 3rem;
-            opacity: 0;
-            animation: peek 1s ease-in-out forwards;
-            z-index: 3;
-            transform-origin: center;
-            pointer-events: none;
-        }
-        
-        @keyframes peek {
-            0% { transform: scale(0.5); opacity: 0; }
-            20% { transform: scale(1.2); opacity: 1; }
-            80% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(3); opacity: 0; }
-        }
-        
-        /* Sound controls */
-        .sound-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.6);
-            border: 2px solid var(--secondary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 10px var(--secondary-color);
-        }
-        
-        /* Custom music player styling */
-        .custom-music-player {
-            margin-top: 30px;
-            padding: 15px;
-            background: rgba(0,0,0,0.4);
-            border: 2px solid var(--primary-color);
-            border-radius: 15px;
-            text-align: center;
-            animation: glow 2s infinite alternate;
-        }
-        
-        @keyframes glow {
-            0% { box-shadow: 0 0 5px var(--primary-color); }
-            100% { box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--secondary-color); }
-        }
-        
-        .music-title {
-            font-size: 1.3rem;
+        .header h1 {
+            color: #4a5568;
             margin-bottom: 10px;
-            color: var(--accent-color);
+            font-size: 2.5rem;
         }
         
-        .music-controls-custom {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .music-controls-custom button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-            min-width: unset;
-        }
-        
-        .music-progress {
-            height: 8px;
-            width: 100%;
-            background-color: rgba(255,255,255,0.2);
-            border-radius: 4px;
-            margin: 15px 0;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        
-        .music-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            width: 0%;
-            border-radius: 4px;
-            transition: width 0.1s linear;
-        }
-        
-        .music-time {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-        
-        .music-notes {
-            position: relative;
-            height: 30px;
-            margin: 10px 0;
-        }
-        
-        .music-note {
-            position: absolute;
-            font-size: 20px;
-            opacity: 0;
-            top: 0;
-            animation: float-note 2s linear forwards;
-        }
-        
-        @keyframes float-note {
-            0% { transform: translateY(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-30px); opacity: 0; }
-        }
-        
-        .volume-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .volume-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-            outline: none;
-        }
-        
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: var(--secondary-color);
-            cursor: pointer;
-        }
-        
-        .volume-slider::-moz-range-thumb {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: var(--secondary-color);
-            cursor: pointer;
-            border: none;
-        }
-        
-        /* Gift card form styling */
-        .gift-card-form {
-            background: linear-gradient(135deg, rgba(255, 62, 157, 0.2), rgba(12, 242, 255, 0.2));
-            border: 2px solid var(--accent-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: center;
-            max-width: 100%;
-            animation: fadeInScale 1s forwards;
-            box-shadow: 0 0 20px rgba(255, 214, 57, 0.5);
-        }
-        
-        .gift-card-form h3 {
-            color: var(--accent-color);
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-        
-        .gift-card-form p {
-            margin-bottom: 20px;
-        }
-        
-        .gift-card-form input[type="email"] {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            font-size: 1rem;
-        }
-        
-        .gift-card-form button {
-            background: linear-gradient(135deg, var(--accent-color), #FFB700);
-            color: var(--dark-color);
-            font-weight: bold;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .gift-card-form button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .gift-thanks {
-            display: none;
-            background: linear-gradient(135deg, rgba(12, 242, 255, 0.3), rgba(255, 62, 157, 0.3));
-            border: 2px solid var(--secondary-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            animation: fadeInScale 1s forwards;
-        }
-        
-        .gift-icon {
-            font-size: 4rem;
-            margin: 15px 0;
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
-        
-        /* Surprise link */
-        .surprise-gift-link {
-            display: inline-block;
-            margin: 20px 0;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #FFD639, #FFA726);
-            color: var(--dark-color);
-            text-decoration: none;
-            font-weight: bold;
+        .header p {
+            color: #718096;
             font-size: 1.2rem;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            animation: pulse 2s infinite;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        .surprise-gift-link:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        .nav-btn:hover {
+            background: #3182ce;
+            transform: translateY(-2px);
         }
         
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            h1 { font-size: 1.8rem; }
-            h2 { font-size: 1.3rem; }
-            .cake { font-size: 4rem; }
-            .balloon { font-size: 2.5rem; }
-            .surprise-reveal { font-size: 2rem; }
-            .lock-icon { font-size: 4rem; }
-            .terminal::before { font-size: 1rem; }
-            .sound-button { width: 40px; height: 40px; font-size: 1.2rem; }
-            .music-title { font-size: 1.1rem; }
-            .gift-card-form h3 { font-size: 1.3rem; }
+        .nav-btn.active {
+            background: #2d3748;
         }
         
-        @media (max-width: 480px) {
-            h1 { font-size: 1.5rem; }
-            h2 { font-size: 1.1rem; }
-            p { font-size: 1rem; }
-            .cake { font-size: 3.5rem; }
-            .balloon { font-size: 2rem; }
-            .surprise-reveal { font-size: 1.7rem; }
-            .lock-icon { font-size: 3.5rem; }
-            button { font-size: 0.9rem; padding: 10px 20px; min-width: 100px; }
-            .unlock-btn { font-size: 1rem; padding: 12px 25px; }
-            .terminal { padding: 15px; }
-            .terminal::before { font-size: 0.9rem; padding: 8px; }
-            .music-title { font-size: 1rem; }
-            .gift-card-form h3 { font-size: 1.2rem; }
-            .surprise-gift-link { font-size: 1rem; padding: 12px 25px; }
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        .lab-container {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .lab-title {
+            background: #4a5568;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+        
+        .vulnerable {
+            border-left: 5px solid #e53e3e;
+        }
+        
+        .secure {
+            border-left: 5px solid #38a169;
+        }
+        
+        .test-area {
+            background: #edf2f7;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .iframe-container {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .test-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-btn:hover {
+            background: #c53030;
+            transform: scale(1.05);
+        }
+        
+        .safe-btn {
+            background: #38a169;
+        }
+        
+        .safe-btn:hover {
+            background: #2f855a;
+        }
+        
+        .warning {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .info {
+            background: #bee3f8;
+            border: 1px solid #90cdf4;
+            color: #2b6cb0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #c6f6d5;
+            border: 1px solid #9ae6b4;
+            color: #276749;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .difficulty-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .basic { background: #c6f6d5; color: #276749; }
+        .intermediate { background: #feebc8; color: #c05621; }
+        .advanced { background: #fed7d7; color: #c53030; }
+        .elite { background: #d6bcfa; color: #553c9a; }
+        
+        .output-area {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #4a5568;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+        
+        .payload-input {
+            font-family: 'Courier New', monospace;
+            background: #f7fafc;
         }
     </style>
 </head>
 <body>
-    <!-- Initial locked screen for surprise effect -->
-    <div id="lockScreen">
-        <div class="lock-icon">🔒</div>
-        <h1>TOP SECRET MESSAGE</h1>
-        <p>Top-secret data ahead......</p>
-        <button class="unlock-btn" onclick="unlockScreen()">UNLOCK</button>
-    </div>
-    
-    <!-- Background elements container -->
-    <div class="background-elements" id="backgroundElements"></div>
-    
-    <!-- Main content -->
-    <div class="container" id="mainContent">
-        <div class="terminal">
-            <div id="birthdayForm">
-                <h2>🔐 SECRET MISSION DETAILS 🔐</h2>
-                <p>You've been selected for a top-secret birthday operation!</p>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 postMessage Security Testing Course</h1>
+            <p>Complete Bug Bounty Guide - From Basic to Elite Level</p>
+        </div>
+        
+        <div class="nav">
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
+                <button class="nav-btn" onclick="showSection('theory')">Theory & Concepts</button>
+                <button class="nav-btn" onclick="showSection('basic')">Basic Labs</button>
+                <button class="nav-btn" onclick="showSection('intermediate')">Intermediate Labs</button>
+                <button class="nav-btn" onclick="showSection('advanced')">Advanced Labs</button>
+                <button class="nav-btn" onclick="showSection('elite')">Elite Labs</button>
+                <button class="nav-btn" onclick="showSection('methodology')">Testing Methodology</button>
+                <button class="nav-btn" onclick="showSection('tools')">Tools & Resources</button>
+            </div>
+        </div>
+        
+        <!-- Introduction Section -->
+        <div id="intro" class="content-section active">
+            <h2>🎯 Course Introduction</h2>
+            <p>Welcome to the comprehensive postMessage security testing course designed specifically for bug bounty hunters. This course will take you from zero knowledge to elite-level testing capabilities.</p>
+            
+            <h3>📚 What You'll Learn</h3>
+            <ul style="margin: 20px 0; padding-left: 30px;">
+                <li>How postMessage API works internally</li>
+                <li>Common vulnerability patterns in real applications</li>
+                <li>Step-by-step testing methodologies</li>
+                <li>Payload crafting and exploitation techniques</li>
+                <li>Advanced bypass methods for modern protections</li>
+                <li>Real-world case studies and examples</li>
+            </ul>
+            
+            <h3>🏆 Course Structure</h3>
+            <div class="lab-container">
+                <div class="difficulty-badge basic">BASIC</div>
+                <p><strong>Foundation Labs:</strong> Understanding postMessage basics, simple origin bypasses</p>
                 
-                <label for="name">👤 Birthday Girl Name:</label>
-                <input type="text" id="name" placeholder="Enter the birthday person's name">
+                <div class="difficulty-badge intermediate">INTERMEDIATE</div>
+                <p><strong>Practical Exploitation:</strong> DOM XSS, data theft, authentication bypass</p>
                 
-                <label for="age">🎂 Birthday Girl's Age :</label>
-                <input type="number" id="age" placeholder="How many years awesome?">
+                <div class="difficulty-badge advanced">ADVANCED</div>
+                <p><strong>Complex Scenarios:</strong> Multiple origin validation, iframe sandboxing bypasses</p>
                 
-                <p> 👥 Friendship Status 🤝::</p>
-                <div class="button-group">
-                    <button onclick="selectAccess('friend')">Friend</button>
-                    <button onclick="selectAccess('family')">Family</button>
-                    <button onclick="selectAccess('bestie')">Best Friend</button>
+                <div class="difficulty-badge elite">ELITE</div>
+                <p><strong>Cutting-Edge Techniques:</strong> Modern framework bypasses, chained exploits</p>
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ Legal Notice:</strong> This course is for educational purposes only. Always ensure you have proper authorization before testing any application. Only test on your own applications or through legitimate bug bounty programs.
+            </div>
+        </div>
+        
+        <!-- Theory Section -->
+        <div id="theory" class="content-section">
+            <h2>🧠 Theory & Core Concepts</h2>
+            
+            <h3>What is postMessage?</h3>
+            <p>The postMessage API enables secure cross-origin communication between different windows, frames, and web workers. It's the backbone of modern web application communication.</p>
+            
+            <div class="code-block">
+// Basic postMessage syntax
+targetWindow.postMessage(message, targetOrigin, [transfer]);
+
+// Listening for messages
+window.addEventListener('message', function(event) {
+    // Handle incoming message
+    console.log('Received:', event.data);
+    console.log('From origin:', event.origin);
+    console.log('Source window:', event.source);
+});
+            </div>
+            
+            <h3>🔍 Key Security Concepts</h3>
+            
+            <div class="lab-container">
+                <h4>1. Origin Validation</h4>
+                <p>The most critical security control in postMessage implementations.</p>
+                
+                <div class="code-block vulnerable">
+// ❌ VULNERABLE: No origin validation
+window.addEventListener('message', function(event) {
+    document.getElementById('content').innerHTML = event.data;
+});
                 </div>
                 
-                <p>Are you ready to launch the surprise?</p>
-                <div class="button-group">
-                    <button class="primary" onclick="startCountdown()">INITIATE SURPRISE 🚀</button>
+                <div class="code-block secure">
+// ✅ SECURE: Proper origin validation
+window.addEventListener('message', function(event) {
+    if (event.origin !== 'https://trusted-domain.com') {
+        return; // Reject untrusted origins
+    }
+    document.getElementById('content').innerHTML = event.data;
+});
                 </div>
             </div>
             
-            <div id="countdownSection" class="command-output">
-                <!-- Countdown will be displayed here -->
+            <div class="lab-container">
+                <h4>2. Data Validation</h4>
+                <p>Always validate and sanitize incoming message data.</p>
+                
+                <div class="code-block vulnerable">
+// ❌ VULNERABLE: Direct DOM manipulation
+window.addEventListener('message', function(event) {
+    if (event.origin === 'https://trusted-domain.com') {
+        eval(event.data); // Never do this!
+    }
+});
+                </div>
+                
+                <div class="code-block secure">
+// ✅ SECURE: Safe data handling
+window.addEventListener('message', function(event) {
+    if (event.origin === 'https://trusted-domain.com') {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'update' && typeof data.content === 'string') {
+                document.getElementById('safe-content').textContent = data.content;
+            }
+        } catch (e) {
+            console.error('Invalid message format');
+        }
+    }
+});
+                </div>
             </div>
             
-            <div id="birthdayMessage" style="display: none;">
-                <!-- Birthday message will be displayed here -->
+            <h3>🎯 Common Vulnerability Patterns</h3>
+            <ul style="margin: 20px 0; padding-left: 30px;">
+                <li><strong>Missing Origin Validation:</strong> Accepting messages from any origin</li>
+                <li><strong>Weak Origin Validation:</strong> Using indexOf() or endsWith() incorrectly</li>
+                <li><strong>Data Injection:</strong> Directly inserting untrusted data into DOM</li>
+                <li><strong>Authentication Bypass:</strong> Trusting postMessage for authentication decisions</li>
+                <li><strong>JSONP-style Callbacks:</strong> Dynamic function execution based on message data</li>
+            </ul>
+        </div>
+        
+        <!-- Basic Labs Section -->
+        <div id="basic" class="content-section">
+            <h2>🟢 Basic Level Labs</h2>
+            
+            <!-- Lab 1 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge basic">BASIC</span>
+                    Lab 1: No Origin Validation
+                </div>
+                
+                <p><strong>Objective:</strong> Exploit a postMessage listener that doesn't validate the origin.</p>
+                
+                <div class="warning">
+                    <strong>Scenario:</strong> A web application uses postMessage to update user preferences but doesn't check the message origin.
+                </div>
+                
+                <div class="code-block vulnerable">
+// Vulnerable Code (running in target window)
+window.addEventListener('message', function(event) {
+    document.getElementById('user-pref').innerHTML = event.data;
+});
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 Test Environment</h4>
+                    <div id="lab1-target" style="border: 2px solid #e2e8f0; padding: 20px; margin: 10px 0; background: white;">
+                        <div id="user-pref">Default user preference</div>
+                    </div>
+                    
+                    <input type="text" id="lab1-payload" class="payload-input" placeholder="Enter your payload here..." value="&lt;img src=x onerror=alert('XSS via postMessage!')&gt;">
+                    
+                    <button class="test-btn" onclick="exploitLab1()">🚀 Exploit Lab 1</button>
+                    <button class="test-btn safe-btn" onclick="resetLab1()">🔄 Reset</button>
+                </div>
+                
+                <div class="info">
+                    <strong>💡 Learning Points:</strong>
+                    <ul>
+                        <li>This is the most common postMessage vulnerability</li>
+                        <li>Any website can send malicious messages to the target</li>
+                        <li>Always validate event.origin before processing messages</li>
+                    </ul>
+                </div>
+                
+                <div id="lab1-output" class="output-area"></div>
+            </div>
+            
+            <!-- Lab 2 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge basic">BASIC</span>
+                    Lab 2: Weak Origin Validation (indexOf)
+                </div>
+                
+                <p><strong>Objective:</strong> Bypass weak origin validation using indexOf().</p>
+                
+                <div class="code-block vulnerable">
+// Vulnerable Code
+window.addEventListener('message', function(event) {
+    if (event.origin.indexOf('trusted-site.com') !== -1) {
+        document.getElementById('content').innerHTML = event.data;
+    }
+});
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 Test Environment</h4>
+                    <div id="lab2-target" style="border: 2px solid #e2e8f0; padding: 20px; margin: 10px 0; background: white;">
+                        <div id="lab2-content">Protected content area</div>
+                    </div>
+                    
+                    <p>Try different origins to bypass the validation:</p>
+                    <input type="text" id="lab2-origin" class="payload-input" placeholder="Enter origin to test..." value="https://evil-trusted-site.com.attacker.com">
+                    <input type="text" id="lab2-payload" class="payload-input" placeholder="Enter payload..." value="&lt;h3 style='color:red'&gt;Origin validation bypassed!&lt;/h3&gt;">
+                    
+                    <button class="test-btn" onclick="exploitLab2()">🚀 Test Origin Bypass</button>
+                    <button class="test-btn safe-btn" onclick="resetLab2()">🔄 Reset</button>
+                </div>
+                
+                <div class="info">
+                    <strong>💡 Learning Points:</strong>
+                    <ul>
+                        <li>indexOf() can be bypassed by including the trusted domain in a subdomain</li>
+                        <li>Never use partial string matching for origin validation</li>
+                        <li>Use exact string comparison or URL parsing for proper validation</li>
+                    </ul>
+                </div>
+                
+                <div id="lab2-output" class="output-area"></div>
+            </div>
+            
+            <!-- Lab 3 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge basic">BASIC</span>
+                    Lab 3: Data Exfiltration via postMessage
+                </div>
+                
+                <p><strong>Objective:</strong> Extract sensitive data from a vulnerable postMessage listener.</p>
+                
+                <div class="code-block vulnerable">
+// Vulnerable Code
+window.addEventListener('message', function(event) {
+    if (event.data.action === 'getData') {
+        event.source.postMessage({
+            userData: {
+                username: 'john_doe',
+                email: 'john@example.com',
+                balance: '$5,000'
+            }
+        }, '*'); // ⚠️ Dangerous wildcard!
+    }
+});
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 Test Environment</h4>
+                    <p>This lab simulates a page that responds to data requests via postMessage:</p>
+                    
+                    <button class="test-btn" onclick="exploitLab3()">🚀 Extract User Data</button>
+                    <button class="test-btn safe-btn" onclick="resetLab3()">🔄 Reset</button>
+                    
+                    <h4>📡 Intercepted Data:</h4>
+                    <div id="lab3-output" class="output-area">No data intercepted yet...</div>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Security Impact:</strong> This vulnerability allows any malicious website to extract sensitive user data by simply requesting it via postMessage.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Intermediate Labs Section -->
+        <div id="intermediate" class="content-section">
+            <h2>🟡 Intermediate Level Labs</h2>
+            
+            <!-- Lab 4 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge intermediate">INTERMEDIATE</span>
+                    Lab 4: Authentication Token Theft
+                </div>
+                
+                <p><strong>Objective:</strong> Steal authentication tokens from a vulnerable OAuth implementation.</p>
+                
+                <div class="code-block vulnerable">
+// Vulnerable OAuth callback handler
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'oauth_token') {
+        localStorage.setItem('auth_token', event.data.token);
+        // Redirect to dashboard
+        window.location.href = '/dashboard';
+    }
+});
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 OAuth Simulation Environment</h4>
+                    <p>Simulate an OAuth flow where tokens are passed via postMessage:</p>
+                    
+                    <input type="text" id="lab4-token" class="payload-input" placeholder="OAuth token..." value="sk_live_abc123xyz789_secret_token">
+                    
+                    <button class="test-btn" onclick="simulateOAuth()">🔐 Simulate OAuth Flow</button>
+                    <button class="test-btn" onclick="exploitOAuth()">🚀 Intercept Token</button>
+                    <button class="test-btn safe-btn" onclick="resetLab4()">🔄 Reset</button>
+                    
+                    <h4>🎯 Captured Tokens:</h4>
+                    <div id="lab4-output" class="output-area">No tokens captured...</div>
+                </div>
+                
+                <div class="info">
+                    <strong>💡 Real-World Impact:</strong> This type of vulnerability is commonly found in OAuth implementations where tokens are passed between windows without proper origin validation.
+                </div>
+            </div>
+            
+            <!-- Lab 5 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge intermediate">INTERMEDIATE</span>
+                    Lab 5: DOM Clobbering via postMessage
+                </div>
+                
+                <p><strong>Objective:</strong> Use DOM clobbering techniques combined with postMessage to achieve XSS.</p>
+                
+                <div class="code-block vulnerable">
+// Vulnerable code using global variable
+window.addEventListener('message', function(event) {
+    if (config.trustedOrigin && event.origin === config.trustedOrigin) {
+        document.body.innerHTML += event.data;
+    }
+});
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 DOM Clobbering Environment</h4>
+                    <p>First, we need to clobber the global config object:</p>
+                    
+                    <textarea id="lab5-clobber" class="payload-input" rows="3" placeholder="DOM clobbering payload...">&lt;form id="config"&gt;&lt;input name="trustedOrigin" value="https://attacker.com"&gt;&lt;/form&gt;</textarea>
+                    
+                    <button class="test-btn" onclick="setupClobbering()">1️⃣ Setup DOM Clobbering</button>
+                    
+                    <textarea id="lab5-payload" class="payload-input" rows="3" placeholder="XSS payload...">&lt;img src=x onerror="alert('DOM Clobbering + postMessage XSS!')"&gt;</textarea>
+                    
+                    <button class="test-btn" onclick="exploitLab5()">2️⃣ Exploit via postMessage</button>
+                    <button class="test-btn safe-btn" onclick="resetLab5()">🔄 Reset</button>
+                    
+                    <div id="lab5-target" style="border: 2px solid #e2e8f0; padding: 20px; margin: 10px 0; background: white; min-height: 100px;">
+                        Target area for DOM clobbering...
+                    </div>
+                </div>
+                
+                <div id="lab5-output" class="output-area"></div>
+            </div>
+        </div>
+        
+        <!-- Advanced Labs Section -->
+        <div id="advanced" class="content-section">
+            <h2>🟠 Advanced Level Labs</h2>
+            
+            <!-- Lab 6 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge advanced">ADVANCED</span>
+                    Lab 6: Multiple Origin Validation Bypass
+                </div>
+                
+                <p><strong>Objective:</strong> Bypass complex origin validation logic using edge cases.</p>
+                
+                <div class="code-block vulnerable">
+// Complex but flawed validation
+window.addEventListener('message', function(event) {
+    const allowedOrigins = [
+        'https://app.example.com',
+        'https://api.example.com',
+        'https://cdn.example.com'
+    ];
+    
+    // Vulnerable: Using some() with partial matching
+    if (allowedOrigins.some(origin => event.origin.endsWith(origin))) {
+        processMessage(event.data);
+    }
+});
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 Advanced Bypass Testing</h4>
+                    <p>Test various origin bypass techniques:</p>
+                    
+                    <select id="lab6-technique">
+                        <option value="subdomain">Subdomain Technique</option>
+                        <option value="tld">TLD Confusion</option>
+                        <option value="unicode">Unicode Bypass</option>
+                        <option value="null">Null Origin</option>
+                    </select>
+                    
+                    <input type="text" id="lab6-origin" class="payload-input" placeholder="Crafted origin..." readonly>
+                    <input type="text" id="lab6-payload" class="payload-input" placeholder="Payload..." value='{"action":"updateProfile","data":"&lt;script&gt;alert(\'Advanced bypass!&');&lt;/script&gt;"}'>
+                    
+                    <button class="test-btn" onclick="updateOriginTechnique()">🔄 Update Technique</button>
+                    <button class="test-btn" onclick="exploitLab6()">🚀 Test Bypass</button>
+                    <button class="test-btn safe-btn" onclick="resetLab6()">🔄 Reset</button>
+                </div>
+                
+                <div id="lab6-output" class="output-area"></div>
+            </div>
+            
+            <!-- Lab 7 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge advanced">ADVANCED</span>
+                    Lab 7: Iframe Sandbox Escape
+                </div>
+                
+                <p><strong>Objective:</strong> Escape iframe sandbox restrictions using postMessage.</p>
+                
+                <div class="info">
+                    <strong>Scenario:</strong> An application loads untrusted content in a sandboxed iframe but uses postMessage for communication. Find a way to escape the sandbox.
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 Sandbox Escape Environment</h4>
+                    
+                    <iframe id="sandboxed-frame" 
+                            sandbox="allow-scripts allow-same-origin" 
+                            srcdoc="
+                                <script>
+                                    // Sandboxed iframe trying to communicate
+                                    window.parent.postMessage({
+                                        type: 'sandboxed_message',
+                                        data: 'Hello from sandbox'
+                                    }, '*');
+                                    
+                                    window.addEventListener('message', function(e) {
+                                        if (e.data.type === 'execute') {
+                                            try {
+                                                eval(e.data.code);
+                                            } catch (err) {
+                                                console.log('Sandbox prevented execution');
+                                            }
+                                        }
+                                    });
+                                </script>
+                                <p>Sandboxed content loaded</p>
+                            " 
+                            class="iframe-container">
+                    </iframe>
+                    
+                    <textarea id="lab7-escape" class="payload-input" rows="4" placeholder="Sandbox escape payload...">parent.location = 'javascript:alert("Sandbox escaped via postMessage!")'</textarea>
+                    
+                    <button class="test-btn" onclick="attemptSandboxEscape()">🚀 Attempt Escape</button>
+                    <button class="test-btn safe-btn" onclick="resetLab7()">🔄 Reset</button>
+                </div>
+                
+                <div id="lab7-output" class="output-area"></div>
+            </div>
+        </div>
+        
+        <!-- Elite Labs Section -->
+        <div id="elite" class="content-section">
+            <h2>🔴 Elite Level Labs</h2>
+            
+            <!-- Lab 8 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge elite">ELITE</span>
+                    Lab 8: React/Vue Framework Bypass
+                </div>
+                
+                <p><strong>Objective:</strong> Exploit postMessage vulnerabilities in modern JavaScript frameworks.</p>
+                
+                <div class="code-block vulnerable">
+// Vulnerable React component
+function MessageHandler() {
+    useEffect(() => {
+        const handleMessage = (event) => {
+            // Vulnerable: Using dangerouslySetInnerHTML
+            if (event.data.type === 'content_update') {
+                setContent({
+                    __html: event.data.html
+                });
+            }
+        };
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
+    
+    return &lt;div dangerouslySetInnerHTML={content} /&gt;;
+}
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 Framework Exploitation Environment</h4>
+                    
+                    <select id="lab8-framework">
+                        <option value="react">React dangerouslySetInnerHTML</option>
+                        <option value="vue">Vue v-html Directive</option>
+                        <option value="angular">Angular innerHTML Binding</option>
+                    </select>
+                    
+                    <textarea id="lab8-payload" class="payload-input" rows="4" placeholder="Framework-specific payload...">
+&lt;img src=x onerror="
+    // React-specific XSS
+    alert('Framework XSS via postMessage!');
+    // Attempt to access React internals
+    console.log(window.React);
+"&gt;
+                    </textarea>
+                    
+                    <button class="test-btn" onclick="exploitFramework()">🚀 Exploit Framework</button>
+                    <button class="test-btn safe-btn" onclick="resetLab8()">🔄 Reset</button>
+                    
+                    <div id="lab8-target" style="border: 2px solid #e2e8f0; padding: 20px; margin: 10px 0; background: white; min-height: 100px;">
+                        Framework component will render here...
+                    </div>
+                </div>
+                
+                <div id="lab8-output" class="output-area"></div>
+            </div>
+            
+            <!-- Lab 9 -->
+            <div class="lab-container">
+                <div class="lab-title">
+                    <span class="difficulty-badge elite">ELITE</span>
+                    Lab 9: Chained Exploit - CSRF + postMessage
+                </div>
+                
+                <p><strong>Objective:</strong> Chain CSRF and postMessage vulnerabilities for maximum impact.</p>
+                
+                <div class="warning">
+                    <strong>Advanced Scenario:</strong> An application uses postMessage to confirm CSRF-protected actions. Exploit both vulnerabilities in sequence.
+                </div>
+                
+                <div class="test-area">
+                    <h4>🧪 Chained Exploitation Environment</h4>
+                    
+                    <div style="display: flex; gap: 20px; margin: 20px 0;">
+                        <div style="flex: 1;">
+                            <h5>Step 1: CSRF Setup</h5>
+                            <input type="text" id="csrf-token" placeholder="CSRF Token..." value="csrf_abc123">
+                            <button class="test-btn" onclick="setupCSRF()">🎯 Setup CSRF</button>
+                        </div>
+                        
+                        <div style="flex: 1;">
+                            <h5>Step 2: postMessage Chain</h5>
+                            <input type="text" id="chain-payload" placeholder="Chained payload..." value='{"action":"transfer","amount":"$10000","to":"attacker"}'>
+                            <button class="test-btn" onclick="executeChain()">⚡ Execute Chain</button>
+                        </div>
+                    </div>
+                    
+                    <button class="test-btn safe-btn" onclick="resetLab9()">🔄 Reset All</button>
+                    
+                    <h4>🎯 Exploitation Timeline:</h4>
+                    <div id="lab9-output" class="output-area">Ready for chained exploitation...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Methodology Section -->
+        <div id="methodology" class="content-section">
+            <h2>🔬 Testing Methodology</h2>
+            
+            <h3>📋 Step-by-Step Testing Process</h3>
+            
+            <div class="lab-container">
+                <h4>Phase 1: Discovery</h4>
+                <ol style="padding-left: 30px; margin: 15px 0;">
+                    <li><strong>Search for postMessage usage:</strong>
+                        <div class="code-block">
+// Search in DevTools Console
+Array.from(document.scripts).map(s => s.innerHTML).join(' ').includes('postMessage')
+
+// Search in Sources tab
+Ctrl+Shift+F → "postMessage"
+Ctrl+Shift+F → "addEventListener.*message"
+                        </div>
+                    </li>
+                    <li><strong>Identify message listeners:</strong> Look for event listeners on 'message' events</li>
+                    <li><strong>Find message senders:</strong> Look for postMessage() calls</li>
+                    <li><strong>Map communication flow:</strong> Understand which windows/frames communicate</li>
+                </ol>
+            </div>
+            
+            <div class="lab-container">
+                <h4>Phase 2: Analysis</h4>
+                <ol style="padding-left: 30px; margin: 15px 0;">
+                    <li><strong>Origin validation analysis:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Is event.origin checked?</li>
+                            <li>How is the validation implemented?</li>
+                            <li>Are there bypass opportunities?</li>
+                        </ul>
+                    </li>
+                    <li><strong>Data handling analysis:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>How is event.data processed?</li>
+                            <li>Is there input validation/sanitization?</li>
+                            <li>Where does the data end up? (DOM, eval, etc.)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Privilege analysis:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>What actions can be triggered?</li>
+                            <li>What sensitive data is accessible?</li>
+                            <li>Are there authentication bypasses?</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+            
+            <div class="lab-container">
+                <h4>Phase 3: Exploitation</h4>
+                <ol style="padding-left: 30px; margin: 15px 0;">
+                    <li><strong>Craft test payloads:</strong> Start with simple payloads and gradually increase complexity</li>
+                    <li><strong>Test origin bypasses:</strong> Try various techniques to bypass origin validation</li>
+                    <li><strong>Test data injection:</strong> Attempt XSS, HTML injection, and other data-based attacks</li>
+                    <li><strong>Document impact:</strong> Clearly demonstrate the security impact</li>
+                </ol>
+            </div>
+            
+            <h3>🛠️ Common Testing Payloads</h3>
+            
+            <div class="code-block">
+// Basic XSS test
+&lt;img src=x onerror=alert('XSS')&gt;
+
+// JSON injection test
+{"type":"update","content":"&lt;script&gt;alert('JSON XSS')&lt;/script&gt;"}
+
+// Origin bypass tests
+https://evil-trusted-domain.com.attacker.com
+https://attacker.com/trusted-domain.com
+data:text/html,&lt;script&gt;/* payload */&lt;/script&gt;
+
+// Unicode bypass
+https://еxample.com (Cyrillic 'е' instead of Latin 'e')
+
+// Protocol bypass
+javascript:alert('XSS')
+vbscript:alert('XSS')
+            </div>
+            
+            <h3>⚡ Quick Testing Script</h3>
+            
+            <div class="code-block">
+// Paste this in DevTools to test for postMessage vulnerabilities
+(function() {
+    const originalAddEventListener = window.addEventListener;
+    window.addEventListener = function(type, listener, options) {
+        if (type === 'message') {
+            console.log('🔍 Found message listener:', listener.toString());
+        }
+        return originalAddEventListener.call(this, type, listener, options);
+    };
+    
+    const originalPostMessage = window.postMessage;
+    window.postMessage = function(message, targetOrigin, transfer) {
+        console.log('📤 postMessage called:', {message, targetOrigin, transfer});
+        return originalPostMessage.call(this, message, targetOrigin, transfer);
+    };
+    
+    console.log('🚀 postMessage monitoring enabled!');
+})();
+            </div>
+        </div>
+        
+        <!-- Tools Section -->
+        <div id="tools" class="content-section">
+            <h2>🛠️ Tools & Resources</h2>
+            
+            <h3>🔧 Browser Developer Tools</h3>
+            <div class="lab-container">
+                <h4>Chrome DevTools</h4>
+                <ul style="padding-left: 30px;">
+                    <li><strong>Console:</strong> Monitor postMessage calls and test payloads</li>
+                    <li><strong>Sources:</strong> Search for postMessage usage across all scripts</li>
+                    <li><strong>Network:</strong> Monitor requests triggered by postMessage</li>
+                    <li><strong>Security:</strong> Check origin and CSP policies</li>
+                </ul>
+                
+                <div class="code-block">
+// Useful Console Commands
+window.postMessage('test', '*');
+window.addEventListener('message', console.log);
+Array.from(document.querySelectorAll('iframe')).map(f => f.src);
+                </div>
+            </div>
+            
+            <h3>🚀 Automated Testing Tools</h3>
+            <div class="lab-container">
+                <h4>Custom Scripts</h4>
+                <div class="code-block">
+// postMessage fuzzer
+function fuzzPostMessage(targetWindow) {
+    const payloads = [
+        '&lt;script&gt;alert("XSS")&lt;/script&gt;',
+        '{"evil": "&lt;img src=x onerror=alert(1)&gt;"}',
+        '"&lt;svg onload=alert(1)&gt;"',
+        'javascript:alert("XSS")'
+    ];
+    
+    payloads.forEach(payload => {
+        targetWindow.postMessage(payload, '*');
+        console.log('Sent payload:', payload);
+    });
+}
+
+// Usage: fuzzPostMessage(document.querySelector('iframe').contentWindow);
+                </div>
+            </div>
+            
+            <h3>📚 Additional Resources</h3>
+            <div class="lab-container">
+                <ul style="padding-left: 30px;">
+                    <li><strong>OWASP Testing Guide:</strong> postMessage security testing methodology</li>
+                    <li><strong>PortSwigger Web Security Academy:</strong> DOM-based vulnerabilities</li>
+                    <li><strong>MDN Documentation:</strong> Complete postMessage API reference</li>
+                    <li><strong>Bug Bounty Reports:</strong> Real-world postMessage vulnerability examples</li>
+                </ul>
+            </div>
+            
+            <h3>✅ Testing Checklist</h3>
+            <div class="test-area">
+                <h4>Pre-Testing Checklist:</h4>
+                <label><input type="checkbox"> Identified all postMessage listeners</label><br>
+                <label><input type="checkbox"> Mapped communication flows</label><br>
+                <label><input type="checkbox"> Analyzed origin validation logic</label><br>
+                <label><input type="checkbox"> Understood data processing</label><br>
+                <label><input type="checkbox"> Prepared test payloads</label><br>
+                <label><input type="checkbox"> Set up testing environment</label><br>
+                
+                <h4>During Testing:</h4>
+                <label><input type="checkbox"> Test for missing origin validation</label><br>
+                <label><input type="checkbox"> Test weak validation bypasses</label><br>
+                <label><input type="checkbox"> Test data injection attacks</label><br>
+                <label><input type="checkbox"> Test privilege escalation</label><br>
+                <label><input type="checkbox"> Document all findings</label><br>
+                <label><input type="checkbox"> Verify impact and exploitability</label><br>
             </div>
         </div>
     </div>
     
-    <!-- Sound control button - removed as requested -->
-    <!--<div class="sound-button" onclick="toggleSound()" id="soundToggle">🔊</div>-->
-
-    <!-- Audio elements -->
-    <audio id="customBirthdaySong" preload="auto" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2023/08/22/audio_bc19dce97d.mp3?filename=happy-birthday-music-box-special-edition-with-effects-179721.mp3" type="audio/mpeg">
-    </audio>
-    
-    <!-- YouTube Embed (hidden initially) -->
-    <div id="youtubePlayerContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center;">
-        <div style="position: relative; width: 80%; max-width: 640px;">
-            <button id="closeYoutubeBtn" style="position: absolute; top: -40px; right: 0; background: var(--accent-color); border: none; color: #000; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 2001;">✖</button>
-            <div id="youtubePlayer" style="width: 100%; aspect-ratio: 16/9;"></div>
-        </div>
-    </div>
-
-    <!-- Gift Form Modal (initially hidden) -->
-    <div id="giftFormModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center;">
-        <div class="gift-card-form" style="width: 90%; max-width: 500px; position: relative;">
-            <button id="closeGiftFormBtn" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: var(--accent-color); width: 30px; height: 30px; font-size: 1.5rem; cursor: pointer;">✖</button>
-            <h3>🎁 Birthday Surprise Gift! 🎁</h3>
-            <p>Enter the 4 digits password as 1234 to unlock your gift:</p>
-            <input type="password" id="giftPasswordInput" placeholder="Enter 4-digit password" maxlength="4" inputmode="numeric" pattern="[0-9]*" required>
-            <button onclick="submitGiftForm()">Unlock My Gift! 🎉</button>
-            
-            <div id="wrongPassword" style="display: none; margin-top: 15px; color: #FF3E9D; font-weight: bold;">
-                Wrong password. Please try again!
-            </div>
-            
-            <div id="giftThanks" class="gift-thanks">
-                <div class="gift-icon">🎁</div>
-                <h3>Gift Unlocked!</h3>
-                <p>Your Amazon Gift Card is ready!</p>
-                <a href="https://www.amazon.in/g/8Q5LOLEBPT978A0U?_encoding=UTF8&asin=B0CWL6LTMK" target="_blank" class="surprise-gift-link" style="display: inline-block; margin-top: 20px;">
-                    Click Here to Claim Your Gift!
-                </a>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // ===== GIFT CARD FUNCTIONALITY =====
+        // Global variables for labs
+        let interceptedData = [];
+        let config = { trustedOrigin: 'https://trusted-site.com' };
         
-        // Show the gift form modal
-        const showGiftForm = () => {
-            const modal = document.getElementById('giftFormModal');
-            modal.style.display = 'flex';
-            playSound('gift', 0.7);
-            
-            // Reset any previous attempts
-            document.getElementById('wrongPassword').style.display = 'none';
-            document.getElementById('giftThanks').style.display = 'none';
-            document.getElementById('giftPasswordInput').style.display = 'block';
-            document.getElementById('giftPasswordInput').value = '';
-            document.querySelector('.gift-card-form button').style.display = 'block';
-            document.querySelector('.gift-card-form p').style.display = 'block';
-            
-            // Add event listener to close button
-            document.getElementById('closeGiftFormBtn').addEventListener('click', () => {
-                modal.style.display = 'none';
-                playSound('click', 0.5);
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
             });
-        };
-        
-        // Submit the gift form
-        const submitGiftForm = () => {
-            const passwordInput = document.getElementById('giftPasswordInput');
-            const password = passwordInput.value.trim();
             
-            // Check if password matches
-            if (password === '1234') {
-                // Show the gift link
-                document.getElementById('giftThanks').style.display = 'block';
-                passwordInput.style.display = 'none';
-                document.querySelector('.gift-card-form button').style.display = 'none';
-                document.querySelector('.gift-card-form p').style.display = 'none';
-                document.getElementById('wrongPassword').style.display = 'none';
-                
-                // Play success sound
-                playSound('success', 0.8);
-                
-                // Create some celebration effects
-                launchFireworks();
-                createConfetti();
-            } else {
-                // Show error message
-                document.getElementById('wrongPassword').style.display = 'block';
-                
-                // Play error sound
-                playSound('alert', 0.5);
-                
-                // Clear the password field
-                passwordInput.value = '';
-                passwordInput.focus();
-            }
-        };
-        
-        // ===== SOUND SYSTEM =====
-        
-        // Create audio elements programmatically
-        const soundEffects = {
-            unlock: "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3", // Door unlock sound
-            startup: "https://assets.mixkit.co/active_storage/sfx/209/209-preview.mp3", // Computer startup
-            keypress: "https://assets.mixkit.co/active_storage/sfx/2688/2688-preview.mp3", // Keyboard typing
-            alert: "https://assets.mixkit.co/active_storage/sfx/2867/2867-preview.mp3", // Alert beep
-            countdown: "https://assets.mixkit.co/active_storage/sfx/254/254-preview.mp3", // Countdown beep
-            success: "https://assets.mixkit.co/active_storage/sfx/1343/1343-preview.mp3", // Success sound
-            surprise: "https://assets.mixkit.co/active_storage/sfx/2005/2005-preview.mp3", // Surprise reveal
-            firework: "https://assets.mixkit.co/active_storage/sfx/1393/1393-preview.mp3", // Firework explosion
-            cheer: "https://assets.mixkit.co/active_storage/sfx/535/535-preview.mp3", // Crowd cheering
-            trumpet: "https://assets.mixkit.co/active_storage/sfx/976/976-preview.mp3", // Trumpet fanfare
-            birthday: "https://assets.mixkit.co/active_storage/sfx/531/531-preview.mp3", // Birthday music
-            birthdaySong: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73467.mp3?filename=happy-birthday-tropical-house-version-1-16104.mp3", // Royalty-free happy birthday song
-            click: "https://assets.mixkit.co/active_storage/sfx/2675/2675-preview.mp3", // Button click
-            gift: "https://assets.mixkit.co/active_storage/sfx/1167/1167-preview.mp3" // Gift notification sound
-        };
-        
-        // Create audio elements and store them
-        const sounds = {};
-        for (const [key, url] of Object.entries(soundEffects)) {
-            const audio = new Audio(url);
-            if (key === 'birthday' || key === 'birthdaySong') {
-                audio.loop = true;
-            }
-            sounds[key] = audio;
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
         }
         
-        // Sound control variables
-        let soundEnabled = true;
-        let audioContext = null;
-        
-        // Initialize AudioContext on first user interaction
-        const initAudio = () => {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    // Try to play a silent sound to unlock audio on iOS
-                    const silentSound = audioContext.createOscillator();
-                    silentSound.frequency.value = 0;
-                    silentSound.connect(audioContext.destination);
-                    silentSound.start(0);
-                    silentSound.stop(0.001);
-                } catch (e) {
-                    console.log("Audio context could not be created:", e);
-                }
+        // Lab 1: No Origin Validation
+        function exploitLab1() {
+            const payload = document.getElementById('lab1-payload').value;
+            const output = document.getElementById('lab1-output');
+            
+            // Simulate postMessage attack
+            const event = {
+                origin: 'https://evil-attacker.com',
+                data: payload,
+                source: window
+            };
+            
+            // Vulnerable handler (no origin validation)
+            try {
+                document.getElementById('user-pref').innerHTML = payload;
+                output.innerHTML = `
+✅ EXPLOIT SUCCESSFUL!
+Origin: ${event.origin}
+Payload: ${payload}
+Result: XSS executed - No origin validation present!
+                `;
+            } catch (e) {
+                output.innerHTML = `❌ Exploit failed: ${e.message}`;
             }
-        };
+        }
         
-        // Play sound with volume control and error handling
-        const playSound = (soundKey, volume = 1.0) => {
-            if (soundEnabled && sounds[soundKey]) {
-                try {
-                    // Ensure audio is initialized
-                    initAudio();
-                    
-                    // Reset the sound to the beginning if it's already playing
-                    sounds[soundKey].currentTime = 0;
-                    sounds[soundKey].volume = volume;
-                    
-                    // Try to play the sound
-                    const playPromise = sounds[soundKey].play();
-                    
-                    // Handle the play promise
-                    if (playPromise !== undefined) {
-                        playPromise.catch(e => {
-                            console.log(`Sound play error (${soundKey}):`, e);
-                            // If autoplay is blocked, we'll try again after a user gesture
-                            document.body.addEventListener('click', () => {
-                                sounds[soundKey].play().catch(() => {});
-                            }, { once: true });
-                        });
-                    }
-                } catch (e) {
-                    console.log(`Error playing ${soundKey}:`, e);
-                }
-            }
-        };
+        function resetLab1() {
+            document.getElementById('user-pref').innerHTML = 'Default user preference';
+            document.getElementById('lab1-output').innerHTML = '';
+        }
         
-        // Stop all sounds
-        const stopAllSounds = () => {
-            for (const sound of Object.values(sounds)) {
-                try {
-                    sound.pause();
-                    sound.currentTime = 0;
-                } catch (e) {
-                    console.log("Error stopping sound:", e);
-                }
-            }
-        };
-        
-        // Toggle sound on/off
-        const toggleSound = () => {
-            soundEnabled = !soundEnabled;
-            const soundToggle = document.getElementById('soundToggle');
-            if (!soundEnabled) {
-                stopAllSounds();
-                soundToggle.textContent = "🔇";
+        // Lab 2: Weak Origin Validation
+        function exploitLab2() {
+            const origin = document.getElementById('lab2-origin').value;
+            const payload = document.getElementById('lab2-payload').value;
+            const output = document.getElementById('lab2-output');
+            
+            // Simulate weak validation
+            if (origin.indexOf('trusted-site.com') !== -1) {
+                document.getElementById('lab2-content').innerHTML = payload;
+                output.innerHTML = `
+✅ ORIGIN VALIDATION BYPASSED!
+Tested Origin: ${origin}
+Validation: indexOf('trusted-site.com') !== -1
+Result: Validation bypassed because '${origin}' contains 'trusted-site.com'
+Payload executed: ${payload}
+                `;
             } else {
-                soundToggle.textContent = "🔊";
-                playSound('click', 0.5);
+                output.innerHTML = `
+❌ Origin validation blocked the attack
+Origin '${origin}' does not contain 'trusted-site.com'
+Try: evil-trusted-site.com.attacker.com
+                `;
             }
-        };
+        }
         
-        // ===== VISUAL EFFECTS =====
+        function resetLab2() {
+            document.getElementById('lab2-content').innerHTML = 'Protected content area';
+            document.getElementById('lab2-output').innerHTML = '';
+        }
         
-        // Create a firework
-        const createFirework = () => {
-            const colors = [
-                '#FF3E9D', '#0CF2FF', '#FFD639', '#FF8C00', 
-                '#39FF14', '#9B30FF', '#FF1493', '#00FFFF'
-            ];
+        // Lab 3: Data Exfiltration
+        function exploitLab3() {
+            const output = document.getElementById('lab3-output');
             
-            const firework = document.createElement('div');
-            firework.className = 'firework';
-            firework.style.left = `${Math.random() * 100}vw`;
-            firework.style.top = `${Math.random() * 100}vh`;
-            firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            firework.style.boxShadow = `0 0 10px 2px ${firework.style.backgroundColor}`;
-            
-            document.getElementById('backgroundElements').appendChild(firework);
-            
-            // Play firework sound randomly
-            if (Math.random() > 0.7) {
-                playSound('firework', 0.4);
-            }
-            
-            // Remove after animation completes
-            setTimeout(() => {
-                firework.remove();
-            }, 1500);
-        };
-        
-        // Create confetti
-        const createConfetti = () => {
-            const colors = [
-                '#FF3E9D', '#0CF2FF', '#FFD639', '#FF8C00', 
-                '#39FF14', '#9B30FF', '#FF1493', '#00FFFF'
-            ];
-            
-            for (let i = 0; i < 50; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = `${Math.random() * 100}vw`;
-                    confetti.style.width = `${5 + Math.random() * 10}px`;
-                    confetti.style.height = `${10 + Math.random() * 15}px`;
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDuration = `${3 + Math.random() * 5}s`;
-                    
-                    document.getElementById('backgroundElements').appendChild(confetti);
-                    
-                    // Remove after animation completes
-                    setTimeout(() => {
-                        confetti.remove();
-                    }, 8000);
-                }, i * 100);
-            }
-        };
-        
-        // Create surprise peek element during countdown
-        const createSurprisePeek = () => {
-            const elements = ['🎁', '🎈', '🎉', '🎊', '✨', '🎂', '🥳', '🎇', '🎆'];
-            const element = elements[Math.floor(Math.random() * elements.length)];
-            
-            const peek = document.createElement('div');
-            peek.className = 'surprise-peek';
-            peek.textContent = element;
-            peek.style.left = `${Math.random() * 90 + 5}vw`;
-            peek.style.top = `${Math.random() * 90 + 5}vh`;
-            
-            document.getElementById('backgroundElements').appendChild(peek);
-            
-            // Remove after animation completes
-            setTimeout(() => {
-                peek.remove();
-            }, 1000);
-        };
-        
-        // Launch multiple fireworks
-        const launchFireworks = () => {
-            for (let i = 0; i < 15; i++) {
-                setTimeout(createFirework, i * 300);
-            }
-        };
-        
-        // ===== CUSTOM SONG PLAYER =====
-        
-        // Create floating music notes animation
-        const createMusicNote = (container) => {
-            const notes = ['♪', '♫', '♩', '♬', '🎵', '🎶'];
-            const note = document.createElement('div');
-            note.className = 'music-note';
-            note.textContent = notes[Math.floor(Math.random() * notes.length)];
-            note.style.left = `${Math.random() * 100}%`;
-            note.style.color = `hsl(${Math.random() * 360}, 100%, 75%)`;
-            container.appendChild(note);
-            
-            setTimeout(() => {
-                note.remove();
-            }, 2000);
-        };
-        
-        // Start music notes animation
-        let notesInterval;
-        const startNotesAnimation = (container) => {
-            // Clear any existing interval
-            if (notesInterval) clearInterval(notesInterval);
-            
-            // Create new interval
-            notesInterval = setInterval(() => {
-                createMusicNote(container);
-            }, 300);
-        };
-        
-        // Stop music notes animation
-        const stopNotesAnimation = () => {
-            clearInterval(notesInterval);
-        };
-        
-        // Format time for music player
-        const formatTime = (seconds) => {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        };
-        
-        // ===== MAIN FUNCTIONALITY =====
-        
-        // Access level variable
-        let accessLevel = "";
-        
-        // Unlock the initial screen
-        const unlockScreen = () => {
-            playSound('unlock', 0.8);
-            
-            const lockScreen = document.getElementById('lockScreen');
-            lockScreen.style.transform = 'translateY(-100%)';
-            
-            setTimeout(() => {
-                lockScreen.style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                
-                // Play startup sound
-                setTimeout(() => {
-                    playSound('startup', 0.7);
-                }, 500);
-            }, 500);
-            
-            // Initialize audio as user has interacted
-            initAudio();
-        };
-        
-        // Select access level
-        const selectAccess = (level) => {
-            playSound('click', 0.5);
-            
-            accessLevel = level;
-            const buttons = document.querySelectorAll('.button-group button:not(.primary)');
-            
-            buttons.forEach(btn => {
-                if (level === 'bestie' && btn.textContent === 'Best Friend') {
-                    btn.classList.add('selected');
-                } else if (btn.textContent.toLowerCase() === level.toLowerCase()) {
-                    btn.classList.add('selected');
-                } else {
-                    btn.classList.remove('selected');
+            // Simulate data exfiltration attack
+            const stolenData = {
+                userData: {
+                    username: 'john_doe',
+                    email: 'john@example.com',
+                    balance: '$5,000',
+                    sessionToken: 'sess_abc123xyz789',
+                    lastLogin: new Date().toISOString()
                 }
-            });
-        };
+            };
+            
+            interceptedData.push(stolenData);
+            
+            output.innerHTML = `
+🚨 SENSITIVE DATA INTERCEPTED!
+Timestamp: ${new Date().toLocaleString()}
+Data stolen: ${JSON.stringify(stolenData, null, 2)}
+
+💥 Impact: Complete user data compromise!
+- Username and email exposed
+- Financial information leaked
+- Session token stolen (account takeover possible)
+            `;
+        }
         
-        // Start the surprise countdown
-        const startCountdown = () => {
-            playSound('alert', 0.6);
+        function resetLab3() {
+            interceptedData = [];
+            document.getElementById('lab3-output').innerHTML = 'No data intercepted yet...';
+        }
+        
+        // Lab 4: OAuth Token Theft
+        function simulateOAuth() {
+            const token = document.getElementById('lab4-token').value;
             
-            const name = document.getElementById('name').value;
-            const age = document.getElementById('age').value;
+            // Store token in simulated localStorage
+            sessionStorage.setItem('oauth_token', token);
             
-            if (!name) {
-                alert("Please enter the birthday person's name to continue!");
+            alert('OAuth flow simulated - token stored in session');
+        }
+        
+        function exploitOAuth() {
+            const output = document.getElementById('lab4-output');
+            const token = sessionStorage.getItem('oauth_token') || 'No token found';
+            
+            output.innerHTML = `
+🎯 OAUTH TOKEN INTERCEPTED!
+Stolen Token: ${token}
+Method: postMessage interception
+Impact: Full account access with stolen OAuth token
+
+⚠️ Real-world consequences:
+- Complete account takeover
+- Access to user's connected apps
+- Potential financial fraud
+            `;
+        }
+        
+        function resetLab4() {
+            sessionStorage.removeItem('oauth_token');
+            document.getElementById('lab4-output').innerHTML = 'No tokens captured...';
+        }
+        
+        // Lab 5: DOM Clobbering
+        function setupClobbering() {
+            const payload = document.getElementById('lab5-clobber').value;
+            const target = document.getElementById('lab5-target');
+            const output = document.getElementById('lab5-output');
+            
+            target.innerHTML = payload;
+            
+            // Check if clobbering worked
+            setTimeout(() => {
+                if (window.config && window.config.trustedOrigin) {
+                    output.innerHTML = `
+✅ DOM CLOBBERING SUCCESSFUL!
+Original config.trustedOrigin: 'https://trusted-site.com'
+Clobbered config.trustedOrigin: '${window.config.trustedOrigin.value}'
+Ready for postMessage exploitation...
+                    `;
+                } else {
+                    output.innerHTML = '❌ DOM clobbering failed';
+                }
+            }, 100);
+        }
+        
+        function exploitLab5() {
+            const payload = document.getElementById('lab5-payload').value;
+            const output = document.getElementById('lab5-output');
+            
+            // Simulate postMessage with clobbered origin validation
+            if (window.config && window.config.trustedOrigin && window.config.trustedOrigin.value === 'https://attacker.com') {
+                document.getElementById('lab5-target').innerHTML += payload;
+                output.innerHTML += `
+
+🚨 EXPLOITATION COMPLETE!
+DOM clobbering bypassed origin validation
+XSS payload executed: ${payload}
+                `;
+            } else {
+                output.innerHTML += `
+❌ Setup DOM clobbering first!
+                `;
+            }
+        }
+        
+        function resetLab5() {
+            document.getElementById('lab5-target').innerHTML = 'Target area for DOM clobbering...';
+            document.getElementById('lab5-output').innerHTML = '';
+            // Reset global config
+            config = { trustedOrigin: 'https://trusted-site.com' };
+        }
+        
+        // Lab 6: Advanced Origin Bypass
+        function updateOriginTechnique() {
+            const technique = document.getElementById('lab6-technique').value;
+            const originInput = document.getElementById('lab6-origin');
+            
+            const techniques = {
+                'subdomain': 'https://evil-app.example.com.attacker.com',
+                'tld': 'https://app.example.com.evil.com',
+                'unicode': 'https://аpp.example.com', // Cyrillic 'а'
+                'null': 'null'
+            };
+            
+            originInput.value = techniques[technique];
+        }
+        
+        function exploitLab6() {
+            const origin = document.getElementById('lab6-origin').value;
+            const payload = document.getElementById('lab6-payload').value;
+            const output = document.getElementById('lab6-output');
+            
+            const allowedOrigins = [
+                'https://app.example.com',
+                'https://api.example.com',
+                'https://cdn.example.com'
+            ];
+            
+            // Vulnerable validation using endsWith
+            const isAllowed = allowedOrigins.some(allowed => origin.endsWith(allowed));
+            
+            if (isAllowed) {
+                output.innerHTML = `
+✅ ADVANCED BYPASS SUCCESSFUL!
+Tested Origin: ${origin}
+Validation Logic: allowedOrigins.some(allowed => origin.endsWith(allowed))
+Bypass Technique: ${document.getElementById('lab6-technique').value}
+Payload: ${payload}
+
+🎯 This demonstrates how complex validation can still be vulnerable!
+                `;
+            } else {
+                output.innerHTML = `
+❌ Bypass attempt failed
+Try different techniques or check the origin format
+                `;
+            }
+        }
+        
+        function resetLab6() {
+            document.getElementById('lab6-output').innerHTML = '';
+            updateOriginTechnique();
+        }
+        
+        // Lab 7: Sandbox Escape
+        function attemptSandboxEscape() {
+            const payload = document.getElementById('lab7-escape').value;
+            const output = document.getElementById('lab7-output');
+            
+            try {
+                // Simulate sending message to sandboxed iframe
+                const iframe = document.getElementById('sandboxed-frame');
+                iframe.contentWindow.postMessage({
+                    type: 'execute',
+                    code: payload
+                }, '*');
+                
+                output.innerHTML = `
+🚀 SANDBOX ESCAPE ATTEMPTED!
+Payload sent to sandboxed iframe: ${payload}
+Method: postMessage to iframe.contentWindow
+Result: Check console for execution results
+
+Note: Real sandbox escapes depend on specific browser implementations
+and sandbox policies. This is a simulation for educational purposes.
+                `;
+            } catch (e) {
+                output.innerHTML = `❌ Sandbox escape blocked: ${e.message}`;
+            }
+        }
+        
+        function resetLab7() {
+            document.getElementById('lab7-output').innerHTML = '';
+        }
+        
+        // Lab 8: Framework Bypass
+        function exploitFramework() {
+            const framework = document.getElementById('lab8-framework').value;
+            const payload = document.getElementById('lab8-payload').value;
+            const target = document.getElementById('lab8-target');
+            const output = document.getElementById('lab8-output');
+            
+            // Simulate framework-specific vulnerability
+            target.innerHTML = payload;
+            
+            output.innerHTML = `
+⚡ FRAMEWORK EXPLOIT EXECUTED!
+Target Framework: ${framework}
+Attack Vector: postMessage → ${framework} innerHTML
+Payload: ${payload}
+
+🔥 Framework-specific vulnerabilities:
+- React: dangerouslySetInnerHTML bypass
+- Vue: v-html directive exploitation  
+- Angular: innerHTML binding attack
+
+Impact: Full XSS in modern framework context!
+            `;
+        }
+        
+        function resetLab8() {
+            document.getElementById('lab8-target').innerHTML = 'Framework component will render here...';
+            document.getElementById('lab8-output').innerHTML = '';
+        }
+        
+        // Lab 9: Chained Exploitation
+        let csrfSetup = false;
+        
+        function setupCSRF() {
+            const token = document.getElementById('csrf-token').value;
+            csrfSetup = true;
+            
+            const output = document.getElementById('lab9-output');
+            output.innerHTML = `
+🎯 Step 1 Complete: CSRF Setup
+- CSRF token obtained: ${token}
+- Target endpoint identified: /api/transfer
+- Ready for postMessage chain...
+            `;
+        }
+        
+        function executeChain() {
+            const payload = document.getElementById('chain-payload').value;
+            const output = document.getElementById('lab9-output');
+            
+            if (!csrfSetup) {
+                output.innerHTML += `
+❌ Complete CSRF setup first!
+                `;
                 return;
             }
             
-            // Hide the form and show countdown
-            document.getElementById('birthdayForm').style.display = 'none';
-            
-            const countdownSection = document.getElementById('countdownSection');
-            countdownSection.classList.add('active');
-            countdownSection.innerHTML = '<h2>SURPRISE LAUNCH SEQUENCE INITIATED</h2>';
-            
-            // Start countdown
-            const countdownNumbers = ['5️⃣', '4️⃣', '3️⃣', '2️⃣', '1️⃣', '🎉'];
-            const countdownText = [
-                'Preparing celebration protocols...',
-                'Loading special birthday algorithms...',
-                'Activating surprise systems...',
-                'Charging happiness generators...',
-                'Finalizing birthday sequence...',
-                'SURPRISE ACTIVATED!'
-            ];
-            
-            for (let i = 0; i < countdownNumbers.length; i++) {
-                setTimeout(() => {
-                    // Add countdown number
-                    const numberDiv = document.createElement('div');
-                    numberDiv.className = 'command-line';
-                    numberDiv.innerHTML = `<span class="countdown-number">${countdownNumbers[i]}</span><span class="countdown-text">${countdownText[i]}</span>`;
-                    countdownSection.appendChild(numberDiv);
-                    countdownSection.scrollTop = countdownSection.scrollHeight;
-                    
-                    // Play countdown sound for numbers, success sound for last one
-                    if (i < countdownNumbers.length - 1) {
-                        playSound('countdown', 0.6);
-                        createSurprisePeek();
-                    } else {
-                        playSound('surprise', 0.8);
-                        setTimeout(() => {
-                            playSound('cheer', 0.5);
-                            playSound('trumpet', 0.6);
-                        }, 500);
-                        
-                        // Show birthday message after the last countdown
-                        setTimeout(() => {
-                            showBirthdayMessage(name, age);
-                        }, 1500);
-                    }
-                }, i * 1500);
-            }
-        };
-        
-        // Create custom music player for Happy Birthday song
-        const createCustomMusicPlayer = (name) => {
-            const playerContainer = document.createElement('div');
-            playerContainer.className = 'custom-music-player';
-            
-            // Get the custom birthday song
-            const customSong = document.getElementById('customBirthdaySong');
-            
-            // Create player elements
-            const playerHTML = `
-                <div class="music-title">🎵 Happy Birthday ${name}! 🎵</div>
-                <div class="music-notes" id="musicNotes"></div>
-                <div class="music-progress" id="musicProgress">
-                    <div class="music-progress-bar" id="musicProgressBar"></div>
-                </div>
-                <div class="music-time">
-                    <span id="currentTime">0:00</span>
-                    <span id="totalTime">0:00</span>
-                </div>
-                <div class="music-controls-custom">
-                    <button id="playBtn">▶️</button>
-                    <button id="pauseBtn">⏸️</button>
-                    <button id="restartBtn">🔄</button>
-                </div>
-                <div class="volume-control">
-                    <span>🔈</span>
-                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
-                    <span>🔊</span>
-                </div>
-                <div style="margin-top: 20px; text-align: center;">
-                    <button id="specialSongBtn" style="background: linear-gradient(135deg, #FFD700, #FFA500); padding: 12px 25px; font-size: 1.1rem; min-width: 200px; animation: pulse 2s infinite;" onclick="showYouTubePlayer()">
-                        🎵 Play Special Birthday Song 🎵
-                    </button>
-                </div>
-                <div style="margin-top: 25px; text-align: center;">
-                    <div class="surprise-gift-link" onclick="showGiftForm()">
-                        🎁 Click Here for Birthday Gift Surprise! 🎁
-                    </div>
-                </div>
-            `;
-            
-            playerContainer.innerHTML = playerHTML;
-            
-            // Return the player element to be added to the DOM
-            return playerContainer;
-        };
-        
-        // Load YouTube API
-        const loadYouTubeAPI = () => {
-            if (!window.YT) { // If YouTube API is not loaded yet
-                const tag = document.createElement('script');
-                tag.src = "https://www.youtube.com/iframe_api";
-                const firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            }
-        };
-        
-        // Initialize YouTube player
-        let youtubePlayer;
-        window.onYouTubeIframeAPIReady = () => {
-            youtubePlayer = new YT.Player('youtubePlayer', {
-                height: '360',
-                width: '640',
-                videoId: 'OOaj7xUqPUM',
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 1,
-                    'rel': 0,
-                    'showinfo': 0,
-                    'modestbranding': 1
-                }
-            });
-        };
-        
-        // Show YouTube video player
-        const showYouTubePlayer = () => {
-            const container = document.getElementById('youtubePlayerContainer');
-            container.style.display = 'flex';
-            
-            if (youtubePlayer && youtubePlayer.playVideo) {
-                youtubePlayer.playVideo();
-            }
-            
-            // Pause the custom song when YouTube is playing
-            const customSong = document.getElementById('customBirthdaySong');
-            if (customSong) {
-                customSong.pause();
-            }
-        };
-        
-        // Close YouTube player
-        const closeYouTubePlayer = () => {
-            const container = document.getElementById('youtubePlayerContainer');
-            container.style.display = 'none';
-            
-            if (youtubePlayer && youtubePlayer.pauseVideo) {
-                youtubePlayer.pauseVideo();
-            }
-        };
+            output.innerHTML += `
 
-        // Initialize custom music player functionality
-        const initMusicPlayer = () => {
-            // Get elements
-            const customSong = document.getElementById('customBirthdaySong');
-            const playBtn = document.getElementById('playBtn');
-            const pauseBtn = document.getElementById('pauseBtn');
-            const restartBtn = document.getElementById('restartBtn');
-            const volumeSlider = document.getElementById('volumeSlider');
-            const musicProgress = document.getElementById('musicProgress');
-            const musicProgressBar = document.getElementById('musicProgressBar');
-            const currentTime = document.getElementById('currentTime');
-            const totalTime = document.getElementById('totalTime');
-            const musicNotes = document.getElementById('musicNotes');
-            
-            // Load YouTube API
-            loadYouTubeAPI();
-            
-            // Set initial volume
-            customSong.volume = volumeSlider.value / 100;
-            
-            // Add event listeners
-            playBtn.addEventListener('click', () => {
-                stopAllSounds(); // Stop any other sounds
-                customSong.play();
-                startNotesAnimation(musicNotes);
-            });
-            
-            pauseBtn.addEventListener('click', () => {
-                customSong.pause();
-                stopNotesAnimation();
-            });
-            
-            restartBtn.addEventListener('click', () => {
-                customSong.currentTime = 0;
-                customSong.play();
-            });
-            
-            volumeSlider.addEventListener('input', () => {
-                customSong.volume = volumeSlider.value / 100;
-            });
-            
-            // Setup YouTube close button
-            document.getElementById('closeYoutubeBtn').addEventListener('click', closeYouTubePlayer);
-            
-            // Update progress bar
-            customSong.addEventListener('timeupdate', () => {
-                const percent = (customSong.currentTime / customSong.duration) * 100;
-                musicProgressBar.style.width = `${percent}%`;
-                currentTime.textContent = formatTime(customSong.currentTime);
-                
-                // Generate music notes randomly while playing
-                if(!customSong.paused && Math.random() > 0.9) {
-                    createMusicNote(musicNotes);
-                }
-            });
-            
-            // Allow seeking
-            musicProgress.addEventListener('click', (e) => {
-                const percent = e.offsetX / musicProgress.offsetWidth;
-                customSong.currentTime = percent * customSong.duration;
-            });
-            
-            // Set total time once metadata is loaded
-            customSong.addEventListener('loadedmetadata', () => {
-                totalTime.textContent = formatTime(customSong.duration);
-            });
-            
-            // Handle song ending
-            customSong.addEventListener('ended', () => {
-                // If song ends, restart it after a short delay
-                setTimeout(() => {
-                    customSong.currentTime = 0;
-                    customSong.play();
-                }, 2000);
-            });
-            
-            // Play song automatically after a short delay
-            setTimeout(() => {
-                if(soundEnabled) {
-                    customSong.play();
-                    startNotesAnimation(musicNotes);
-                }
-            }, 1000);
-        };
-        
-        // Show the birthday message
-        const showBirthdayMessage = (name, age) => {
-            // Hide countdown, show birthday message
-            document.getElementById('countdownSection').style.display = 'none';
-            const birthdayMessage = document.getElementById('birthdayMessage');
-            birthdayMessage.style.display = 'block';
-            
-            // Create celebratory effects
-            createConfetti();
-            launchFireworks();
-            
-            // Stop all background sounds
-            stopAllSounds();
-            
-            // Build the message based on access level
-            let message = `
-                <div class="birthday-message">
-                    <div class="balloons">
-                        <div class="balloon">🎈</div>
-                        <div class="balloon">🎈</div>
-                        <div class="balloon">🎈</div>
-                        <div class="balloon">🎈</div>
-                        <div class="balloon">🎈</div>
-                    </div>
-                    
-                    <div class="surprise-reveal">SURPRISE!!!</div>
-                    
-                    <p style="background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 2px dashed var(--accent-color); margin: 20px 0;">
-                        <span style="font-style: italic; font-weight: bold;">Hint:</span> To unlock your gift card, click the gift button just below the music player and enter the 4 digits password as 1234.You’ll find that further down the page.
-                    </p>
-                    
-                    <div class="cake">🎂</div>
-                    
-                    <h1>Happy Birthday, ${name}!</h1>
+⚡ Step 2 Complete: Chained Exploitation Executed!
+- CSRF protection bypassed via postMessage
+- Malicious transaction payload: ${payload}
+- Attack flow: CSRF → postMessage → Privilege Escalation
+
+🏆 ELITE LEVEL ACHIEVEMENT UNLOCKED!
+This demonstrates advanced attack chaining techniques
+used in real-world sophisticated attacks.
+
+💥 Total Impact:
+- Financial fraud enabled
+- User authentication bypassed  
+- Multiple security controls defeated
             `;
-            
-            if (age) {
-                message += `<h2>Congratulations on turning ${age}! 🎉</h2>`;
-            }
-            
-            // Add personal message from Rahul Gairola
-            message += `
-                <div style="margin-top: 30px; padding: 20px; border: 2px dashed var(--accent-color); border-radius: 15px; background-color: rgba(0,0,0,0.3);">
-                    <h2 style="color: var(--primary-color); margin-bottom: 15px;">Special Birthday Wishes</h2>
-                    <p style="font-style: italic; font-size: 1.1rem;">On this special day, I wish you a year filled with happiness, success, and beautiful moments that become cherished memories. May your journey ahead be as bright and wonderful as you are!</p>
-                    <p style="text-align: right; margin-top: 10px; font-weight: bold; color: var(--secondary-color);">- Rahul Gairola</p>
-                </div>
-            `;
-            
-            // Add custom music player
-            message += `<div id="customPlayerContainer"></div>`;
-            
-            // Add final celebration elements
-            message += `
-                <div style="margin-top: 30px;">
-                    <div style="font-size: 2rem; margin-bottom: 15px;">🎁 🎉 🎊 🎈 🎂 🎈 🎊 🎉 🎁</div>
-                </div>
-                
-                <div class="button-group" style="margin-top: 30px;">
-                    <button onclick="restartSurprise()">SEND AGAIN 🔄</button>
-                </div>
-            `;
-            
-            birthdayMessage.innerHTML = message;
-            
-            // Add the custom music player to the container
-            const playerContainer = document.getElementById('customPlayerContainer');
-            playerContainer.appendChild(createCustomMusicPlayer(name));
-            
-            // Initialize the player functionality
-            initMusicPlayer();
-            
-            // Start continuous celebration effects
-            startCelebrationEffects();
-        };
+        }
         
-        // Toggle birthday music
-        let musicPlaying = true;
-        const toggleBirthdayMusic = () => {
-            musicPlaying = !musicPlaying;
-            const customSong = document.getElementById('customBirthdaySong');
-            
-            if (musicPlaying) {
-                customSong.play();
-            } else {
-                customSong.pause();
-            }
-            
-            playSound('click', 0.5);
-        };
+        function resetLab9() {
+            csrfSetup = false;
+            document.getElementById('lab9-output').innerHTML = 'Ready for chained exploitation...';
+        }
         
-        // Start continuous celebration effects
-        let celebrationInterval;
-        const startCelebrationEffects = () => {
-            // Initial fireworks and confetti
-            launchFireworks();
-            
-            // Continue with periodic effects
-            celebrationInterval = setInterval(() => {
-                if (Math.random() > 0.5) {
-                    launchFireworks();
-                }
-                
-                if (Math.random() > 0.7) {
-                    createConfetti();
-                }
-            }, 5000);
-        };
+        // Initialize
+        updateOriginTechnique();
         
-        // Restart the surprise
-        const restartSurprise = () => {
-            playSound('click', 0.5);
-            stopAllSounds();
-            clearInterval(celebrationInterval);
-            stopNotesAnimation();
-            location.reload();
-        };
-        
-        // Add event listeners when document is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add click listener to initialize audio
-            document.body.addEventListener('click', initAudio, { once: true });
-            
-            // Preload sounds after a slight delay
-            setTimeout(() => {
-                for (const sound of Object.values(sounds)) {
-                    try {
-                        sound.load();
-                    } catch (e) {
-                        console.log("Error preloading sound:", e);
-                    }
-                }
-            }, 1000);
+        // Add message listener for demo purposes
+        window.addEventListener('message', function(event) {
+            console.log('Demo: Received postMessage', event);
         });
+        
+        // Console welcome message
+        console.log(`
+🔒 postMessage Security Testing Course Loaded!
+🎯 Open DevTools and start exploring the labs
+🚀 All code is available for inspection and learning
+        `);
     </script>
+</body>
+</html>
